@@ -1,0 +1,269 @@
+---
+export type Props = {
+  tags: [string, number][];
+  totalCount: number;
+  mode?: 'simple' | 'advanced';
+  showCloseIcons?: boolean;
+  className?: string;
+};
+
+const {
+  tags,
+  totalCount,
+  mode = 'simple',
+  showCloseIcons = false,
+  className = '',
+} = Astro.props;
+
+// For advanced mode, split tags into visible and hidden
+const visibleTags = mode === 'advanced' ? tags.slice(0, 5) : tags;
+const hiddenTags = mode === 'advanced' ? tags.slice(7) : [];
+const hasHiddenTags = mode === 'advanced' && tags.length > 7;
+---
+
+<section
+  class={`-mt-4 mb-6 block md:hidden ${className}`}
+  aria-label="Filter posts by tags"
+>
+  <div class="flex flex-wrap gap-2" role="group" aria-label="Tag filters">
+    <!-- All button -->
+    <button
+      class="tag-filter border-theme-border text-theme-text-secondary flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+      data-tag="all"
+      aria-pressed="true"
+      aria-label="Show all posts"
+    >
+      <span>All</span>
+      <span class="text-theme-text-secondary">({totalCount})</span>
+    </button>
+
+    <!-- Visible tags -->
+    {
+      visibleTags.map(([tag, count]) => (
+        <button
+          class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+          data-tag={tag}
+          aria-pressed="false"
+          aria-label={`Filter by ${tag} tag (${count} posts)`}
+        >
+          <span>#{tag}</span>
+          <span class="text-theme-text-secondary">({count})</span>
+          {showCloseIcons && (
+            <svg
+              class="close-icon ml-1 hidden h-3 w-3 cursor-pointer opacity-60 hover:opacity-100"
+              fill="currentColor"
+              viewBox="0 0 256 256"
+              onclick="(function(e){e.stopPropagation(); clearTagFilter();})(event);"
+              aria-hidden="true"
+            >
+              <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
+            </svg>
+          )}
+        </button>
+      ))
+    }
+
+    <!-- Hidden tags (advanced mode only) -->
+    {
+      hasHiddenTags && (
+        <div id="extra-tags" class="hidden">
+          {hiddenTags.map(([tag, count]) => (
+            <button
+              class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+              data-tag={tag}
+            >
+              <span>#{tag}</span>
+              <span class="text-theme-text-secondary">({count})</span>
+              {showCloseIcons && (
+                <svg
+                  class="close-icon ml-1 hidden h-3 w-3 cursor-pointer opacity-60 hover:opacity-100"
+                  fill="currentColor"
+                  viewBox="0 0 256 256"
+                  onclick="(function(e){e.stopPropagation(); clearTagFilter();})(event);"
+                >
+                  <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    <!-- Show all/Show less button (advanced mode only) -->
+    {
+      hasHiddenTags && (
+        <button
+          id="show-all-tags"
+          class="border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+        >
+          <span id="show-all-text">Show all</span>
+        </button>
+      )
+    }
+  </div>
+</section>
+
+<script is:inline define:vars={{ mode, showCloseIcons }}>
+  // Initialize mobile tags filter functionality
+  function initMobileTagsFilter() {
+    const tagFilters = document.querySelectorAll('.tag-filter');
+    const writingItems = document.querySelectorAll('.writing-item, .post-item');
+
+    // Function to get URL parameter
+    function getUrlParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // Function to set URL parameter
+    function setUrlParam(param, value) {
+      const url = new URL(window.location.href);
+      if (value === 'all') {
+        url.searchParams.delete(param);
+      } else {
+        url.searchParams.set(param, value);
+      }
+      window.history.pushState({}, '', url.toString());
+    }
+
+    // Function to clear tag filter
+    function clearTagFilter() {
+      setUrlParam('tag', 'all');
+      applyTagFilter('all');
+    }
+
+    // Function to apply tag filter
+    function applyTagFilter(selectedTag) {
+      const tag = selectedTag || 'all';
+
+      // Update the writings section title (if it exists)
+      const writingsTitle = document.getElementById('writings-title');
+      if (writingsTitle) {
+        if (tag === 'all') {
+          writingsTitle.textContent = 'Writings';
+        } else {
+          writingsTitle.textContent = `#${tag}`;
+        }
+      }
+
+      // Reset all items to visible first
+      writingItems.forEach((item) => {
+        item.style.display = 'block';
+      });
+
+      // Update active states for all filters and show/hide close icons
+      tagFilters.forEach((f) => {
+        const closeIcon = f.querySelector('.close-icon');
+
+        // Reset mobile styles
+        f.classList.remove('font-bold', 'text-theme-text', 'border-theme-text');
+        f.classList.add(
+          'font-normal',
+          'text-theme-text-secondary',
+          'border-theme-border',
+        );
+
+        // Hide all close icons first
+        if (closeIcon) {
+          closeIcon.classList.add('hidden');
+        }
+      });
+
+      // Find and activate the correct filter
+      const activeFilters = Array.from(tagFilters).filter(
+        (f) => f.dataset.tag === tag,
+      );
+      activeFilters.forEach((activeFilter) => {
+        const closeIcon = activeFilter.querySelector('.close-icon');
+
+        // Mobile active styles
+        activeFilter.classList.remove(
+          'font-normal',
+          'text-theme-text-secondary',
+          'border-theme-border',
+        );
+        activeFilter.classList.add(
+          'font-bold',
+          'text-theme-text',
+          'border-theme-text',
+        );
+
+        // Show close icon for selected mobile tag (but not for "all")
+        if (closeIcon && tag !== 'all' && showCloseIcons) {
+          closeIcon.classList.remove('hidden');
+        }
+      });
+
+      // Filter items only if not "all"
+      if (tag !== 'all') {
+        writingItems.forEach((item) => {
+          const itemTags = item.dataset.tags
+            ? item.dataset.tags.split(',')
+            : [];
+
+          if (!itemTags.includes(tag)) {
+            item.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    // Initialize tag filter based on URL parameter on page load
+    const initialTag = getUrlParam('tag');
+    applyTagFilter(initialTag);
+
+    // Add click event listeners for tag filters
+    tagFilters.forEach((filter) => {
+      filter.addEventListener('click', () => {
+        const selectedTag = filter.dataset.tag;
+        if (selectedTag) {
+          setUrlParam('tag', selectedTag);
+          applyTagFilter(selectedTag);
+        }
+      });
+    });
+
+    // Show all tags functionality (advanced mode only)
+    if (mode === 'advanced') {
+      const showAllButton = document.getElementById('show-all-tags');
+      const extraTags = document.getElementById('extra-tags');
+      const showAllText = document.getElementById('show-all-text');
+
+      if (showAllButton && extraTags && showAllText) {
+        let isExpanded = false;
+
+        showAllButton.addEventListener('click', () => {
+          if (!isExpanded) {
+            extraTags.classList.remove('hidden');
+            showAllText.textContent = 'Show less';
+            isExpanded = true;
+          } else {
+            extraTags.classList.add('hidden');
+            showAllText.textContent = 'Show all';
+            isExpanded = false;
+          }
+        });
+      }
+    }
+
+    // Make clearTagFilter available globally for inline onclick
+    window.clearTagFilter = clearTagFilter;
+
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', () => {
+      const tag = getUrlParam('tag');
+      applyTagFilter(tag);
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileTagsFilter);
+  } else {
+    initMobileTagsFilter();
+  }
+
+  // Also initialize on astro page transitions
+  document.addEventListener('astro:page-load', initMobileTagsFilter);
+</script>

@@ -1,0 +1,63 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import { filterPublishedContent, sortContentByDate } from "~/utils/content-operations";
+import PostCard from "~/components/post-card.astro";
+
+export type Props = {
+  current: CollectionEntry<"posts">;
+}
+
+const { current } = Astro.props;
+const allPosts = await getCollection("posts");
+const publishedPosts = filterPublishedContent(allPosts);
+
+// helpers
+const norm = (t: string) => t.toLowerCase().trim();
+const tagsOf = (p: CollectionEntry<"posts">) =>
+  (p.data.tags ?? []).map(norm);
+const overlap = (a: string[], b: Set<string>) =>
+  a.reduce((n, t) => n + (b.has(t) ? 1 : 0), 0);
+
+const currentTags = new Set(tagsOf(current));
+const candidates = publishedPosts.filter((p) => p.id !== current.id);
+
+const scored = candidates
+  .map((p) => ({ post: p, score: overlap(tagsOf(p), currentTags) }))
+  .filter((x) => x.score > 0)
+  .sort(
+    (a, b) =>
+      b.score - a.score ||
+      new Date(b.post.data.publishedAt).getTime() - new Date(a.post.data.publishedAt).getTime()
+  );
+
+const latest = sortContentByDate(candidates);
+
+const relatedPosts = (scored.length > 0 ? scored.slice(0, 4).map(x => x.post)
+                                        : latest.slice(0, 4));
+
+const primaryTag = current.data.tags?.[0] ?? null;
+const relatedTitle =
+  (scored.length ? (primaryTag ? `More in #${primaryTag}` : "Related posts")
+                 : "Latest from the blog");
+---
+
+{relatedPosts.length > 0 && (
+  <>
+    <!-- Post end separator -->
+    <div class="flex items-center justify-center mt-4 mb-2">
+      <div class="text-theme-text-tertiary text-xl font-serif tracking-widest">
+        * * * * *
+      </div>
+    </div>
+
+    <section aria-labelledby="related" class="mt-8">
+      <h2 id="related" class="text-lg font-semibold text-theme-text mb-4 font-sans">{relatedTitle}</h2>
+      <ul class="not-prose flex flex-col gap-6 md:gap-8">
+        {relatedPosts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </ul>
+    </section>
+  </>
+)}

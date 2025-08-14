@@ -1,0 +1,139 @@
+---
+import Navigation from '~/components/nav.astro';
+import BaseHead from '~/components/base-head.astro';
+import RootLayout from '~/layouts/root-layout.astro';
+import { formatDate } from '~/utils/format-date';
+import { UI_CONSTANTS } from '~/constants/ui-constants';
+
+export type BaseLayoutProps = {
+  title: string;
+  summary?: string;
+  publishedAt: string;
+  slug: string;
+  tags?: string[];
+  readingTime?: string;
+  renderOnClientRouter?: boolean;
+  articleClass?: string;
+  proseClass?: string;
+};
+
+type Props = BaseLayoutProps;
+
+const {
+  title,
+  summary,
+  publishedAt,
+  slug,
+  tags,
+  readingTime,
+  articleClass,
+  proseClass,
+} = Astro.props;
+
+// Default prose styles from constants
+const defaultProseClass = UI_CONSTANTS.PROSE.default;
+---
+
+<html lang="en" class="scroll-smooth">
+  <head>
+    <BaseHead
+      title={title}
+      description={summary}
+      ogImage={`${import.meta.env.SITE}/blog/${slug}/og.png`}
+      canonical={`${import.meta.env.SITE}/blog/${slug}/`}
+      publishedAt={publishedAt}
+    />
+  </head>
+
+  <RootLayout>
+    <!-- Skip to main content link for accessibility -->
+    <a
+      href="#blog-content"
+      class="focus:bg-theme-text focus:text-theme-bg sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:px-4 focus:py-2 focus:shadow-lg"
+    >
+      Skip to main content
+    </a>
+
+    <nav class="w-full" role="navigation" aria-label="Main navigation">
+      <Navigation />
+    </nav>
+
+    <article
+      id="blog-content"
+      class:list={[
+        'mt-8 flex w-full items-center justify-center lg:mt-20',
+        articleClass,
+      ]}
+      role="main"
+    >
+      <!-- Optional TOC slot -->
+      <slot name="toc" />
+
+      <div class="flex w-full flex-col gap-6">
+        <header class="flex w-full flex-col gap-0">
+          <h1
+            data-pagefind-meta="title"
+            class="w-full font-sans text-3xl font-semibold md:text-3xl"
+          >
+            {title}
+          </h1>
+
+          <div
+            class="text-theme-text-secondary mt-0.5 flex flex-row gap-2 font-sans text-base font-medium md:text-lg"
+          >
+            <time
+              datetime={publishedAt}
+              aria-label={`Published on ${formatDate(publishedAt)}`}
+            >
+              {formatDate(publishedAt)}
+            </time>
+            {
+              readingTime && (
+                <>
+                  <span class="text-theme-text-secondary" aria-hidden="true">
+                    •
+                  </span>
+                  <span class="sr-only">Reading time:</span>
+                  <span aria-label={`Estimated reading time: ${readingTime}`}>
+                    {readingTime}
+                  </span>
+                </>
+              )
+            }
+          </div>
+
+          {
+            tags && tags.length > 0 && (
+              <div
+                class="mt-2 flex flex-wrap gap-2"
+                role="group"
+                aria-label="Post tags"
+              >
+                {tags.map((tag) => (
+                  <a
+                    href={`/posts?tag=${tag}/`}
+                    class="hover:bg-theme-border hover:text-theme-text focus:ring-theme-text px-2 py-1 text-sm font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                    aria-label={`View all posts tagged with ${tag}`}
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </header>
+
+        <article
+          data-pagefind-body
+          class:list={[proseClass || defaultProseClass]}
+          aria-label="Blog post content"
+        >
+          <slot />
+        </article>
+
+        <!-- Related content slot -->
+        <slot name="related" />
+      </div>
+    </article>
+  </RootLayout>
+</html>

@@ -1,0 +1,99 @@
+---
+import { Image as AstroImage } from 'astro:assets';
+import { performanceConfig } from '~/config/site';
+
+// Props type that matches Astro's Image component with additional features
+export type ResponsiveImageProps = {
+  src: any; // Allow string paths and ImageMetadata
+  alt: string;
+  width?: number | string;
+  height?: number | string;
+  sizes?: string;
+  class?: string;
+  'class:list'?: any;
+  loading?: 'lazy' | 'eager';
+  quality?: number;
+  format?: 'webp' | 'avif' | 'jpg' | 'png';
+  priority?: boolean;
+  caption?: string;
+  showCaption?: boolean;
+  [key: string]: any;
+};
+
+type Props = ResponsiveImageProps;
+
+const {
+  caption,
+  showCaption = true,
+  sizes = performanceConfig.imageSizes,
+  quality = 80,
+  format = performanceConfig.imageFormats[0], // Default to first format (webp)
+  width = 800,
+  loading = 'lazy',
+  class: className = '',
+  'class:list': classList,
+  priority,
+  ...imageProps
+} = Astro.props;
+
+// Determine if we should show caption
+const shouldShowCaption = showCaption && caption && caption.trim().length > 0;
+
+// Pass through all props to Image, with our responsive defaults
+const finalImageProps: any = {
+  ...imageProps,
+  sizes,
+  quality,
+  format,
+  width,
+  loading,
+  priority,
+};
+---
+
+{
+  shouldShowCaption ? (
+    <figure class={`responsive-image-figure ${className}`}>
+      <AstroImage {...finalImageProps} class="responsive-image" />
+      <figcaption class="responsive-image-caption">{caption}</figcaption>
+    </figure>
+  ) : (
+    <AstroImage {...finalImageProps} class={`${className}`} />
+  )
+}
+
+<style>
+  @reference "../styles/global.css";
+
+  .responsive-image-figure {
+    @apply mb-6;
+  }
+
+  .responsive-image {
+    @apply h-auto w-full rounded-md shadow-sm;
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .responsive-image:hover {
+    @apply shadow-md;
+  }
+
+  .responsive-image-caption {
+    @apply text-theme-text-secondary mt-2 text-center text-sm italic;
+    @apply font-sans;
+  }
+
+  /* Dark mode adjustments */
+  .dark .responsive-image {
+    @apply shadow-gray-800/20;
+  }
+
+  .dark .responsive-image:hover {
+    @apply shadow-gray-700/30;
+  }
+
+  /* Blue theme adjustments */
+  .blue .responsive-image-caption {
+    @apply text-blue-200;
+  }
+</style>

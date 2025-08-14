@@ -1,0 +1,85 @@
+---
+import type { TocHeading } from '~/utils/toc';
+import TocItem from './toc-item.astro';
+
+type Props = {
+  headings: TocHeading[];
+};
+
+const { headings } = Astro.props;
+---
+
+<nav class="table-of-contents" aria-labelledby="toc-heading">
+  <div class="table-of-contents-anchors">
+    <p id="toc-heading" class="mx-3 text-base font-medium">On this page</p>
+  </div>
+  <ul>
+    {headings.map((toc) => <TocItem {...toc} />)}
+  </ul>
+</nav>
+
+<script>
+  /**
+   * Updates the active heading in the table of contents based on scroll position
+   * Uses Intersection Observer API for better performance than scroll events
+   */
+  function updateActiveHeading() {
+    // Create an intersection observer to watch heading elements
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Get the ID of the heading being observed
+          const id = entry.target.getAttribute('id');
+          // Find the corresponding TOC link
+          const tocLink = document.querySelector(
+            `.table-of-contents a[href="#${id}"]`,
+          );
+
+          if (entry.isIntersecting) {
+            // When a heading enters the viewport:
+            // 1. Remove active class from all TOC links
+            document
+              .querySelectorAll('.table-of-contents a')
+              .forEach((link) => {
+                link.classList.remove('active');
+              });
+            // 2. Add active class to the TOC link for current heading
+            tocLink?.classList.add('active');
+          }
+        });
+      },
+      {
+        // Configure the observer:
+        // - rootMargin: creates a virtual margin around the viewport
+        //   - -100px from top: starts observing after header
+        //   - -66% from bottom: highlights section when it's in upper third of viewport
+        rootMargin: '-100px 0px -66%',
+        // threshold 1.0: callback triggers when entire heading is visible
+        threshold: 1.0,
+      },
+    );
+
+    // Start observing all headings that have IDs
+    document.querySelectorAll('h1[id], h2[id]').forEach((heading) => {
+      observer.observe(heading);
+    });
+
+    // Handle the initial page load state
+    // Highlight the first visible heading's TOC item
+    const firstHeading = document.querySelector('h1[id], h2[id]');
+    if (firstHeading) {
+      const id = firstHeading.getAttribute('id');
+      const tocLink = document.querySelector(
+        `.table-of-contents a[href="#${id}"]`,
+      );
+      tocLink?.classList.add('active');
+    }
+  }
+
+  // Initialize when the page first loads
+  updateActiveHeading();
+
+  // Re-initialize when navigating between pages using Astro's view transitions
+  // This ensures the TOC highlighting works after client-side navigation
+  document.addEventListener('astro:page-load', updateActiveHeading);
+</script>

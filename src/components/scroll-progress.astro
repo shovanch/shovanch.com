@@ -1,0 +1,134 @@
+<div id="progress-container">
+  <button
+    id="scroll-to-top"
+    aria-label="Scroll to top of page"
+    class="flex items-center justify-center"
+  >
+    <svg id="progress-circle" viewBox="0 0 36 36" aria-hidden="true">
+      <path
+        class="circle-bg"
+        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+      ></path>
+      <path
+        id="progress"
+        class="circle"
+        stroke-dasharray="0, 100"
+        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+      ></path>
+    </svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="chevron-up"
+      aria-hidden="true"
+    >
+      <path d="m18 15-6-6-6 6"></path>
+    </svg>
+  </button>
+</div>
+
+<style>
+  #progress-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+
+  #progress-container.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #progress-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .circle-bg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 3.8;
+  }
+
+  .circle {
+    fill: none;
+    stroke: #4caf50;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.3s;
+  }
+
+  .chevron-up {
+    position: relative;
+    z-index: 1;
+  }
+</style>
+
+<script is:inline>
+  let lastScrollTop = 0;
+  let hideTimeout = null;
+
+  document.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
+    const scrollPercent = (scrollTop / scrollHeight) * 100;
+    const progress = document.getElementById('progress');
+    const progressContainer = document.getElementById('progress-container');
+
+    if (progress) {
+      progress.style.strokeDasharray = `${scrollPercent}, 100`;
+    }
+
+    // Show on scroll up
+    if (scrollTop < lastScrollTop && scrollTop > 100) {
+      if (progressContainer) {
+        progressContainer.classList.add('show');
+
+        // Clear existing timeout
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+        }
+
+        // Hide after 3 seconds
+        hideTimeout = setTimeout(() => {
+          progressContainer.classList.remove('show');
+        }, 3000);
+      }
+    }
+
+    lastScrollTop = scrollTop;
+  });
+
+  const progressContainer = document.getElementById('progress-container');
+  if (progressContainer) {
+    progressContainer.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+</script>

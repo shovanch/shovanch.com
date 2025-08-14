@@ -1,0 +1,25 @@
+---
+import { siteConfig } from '~/config/site';
+import SocialLinks from '~/components/social-links.astro';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-theme-bg-secondary mt-12 w-full">
+  <div
+    class="mx-auto flex max-w-3xl flex-col items-center justify-center space-y-2 px-4 py-4 pb-8 text-center md:flex-row md:justify-between md:space-y-0"
+  >
+    <div class="text-theme-text-secondary text-lg font-medium">
+      © {currentYear}
+      <a
+        class="cursor-pointer italic underline decoration-dashed underline-offset-4"
+        href="https://github.com/shovanch/shovanch.com"
+        target="_blank">crafted</a
+      > by <span class="text-theme-chip-post font-semibold italic"
+        >{siteConfig.author}</span
+      >, with love 🥰
+    </div>
+
+    <SocialLinks location="footer" />
+  </div>
+</footer>

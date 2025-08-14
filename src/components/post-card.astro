@@ -1,0 +1,24 @@
+---
+import BaseCard from '~/components/base-card.astro';
+import type { Post } from '~/content.config';
+
+export type PostCardProps = {
+  post: Post;
+};
+
+type Props = PostCardProps;
+
+const { post } = Astro.props;
+---
+
+<BaseCard
+  title={post.data.title}
+  href={`/posts/${post.id}`}
+  publishedAt={post.data.publishedAt}
+  body={post.body}
+  tags={post.data.tags}
+  renderOnClientRouter={post.data.renderOnClientRouter}
+  contentType="post"
+  showExcerpt={true}
+  showType={false}
+/>

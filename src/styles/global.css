@@ -1,0 +1,391 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* Additional font weights - loaded lazily */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/source-serif-4-latin-400-italic.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-500-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-500-italic.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-600-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/source-serif-4-latin-600-italic.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+    U+FFFD;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant blue (&:where(.blue, .blue *));
+
+@theme {
+  --font-sans:
+    'UncutSans-Variable', ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono:
+    'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  --font-serif: 'Source Serif 4', ui-serif, serif, 'Apple Color Emoji';
+
+  /* Custom theme colors using CSS variables */
+  --color-theme-bg: var(--theme-bg);
+  --color-theme-text: var(--theme-text);
+  --color-theme-text-secondary: var(--theme-text-secondary);
+  --color-theme-text-muted: var(--theme-text-muted);
+  --color-theme-link: var(--theme-link);
+  --color-theme-link-hover: var(--theme-link-hover);
+  --color-theme-border: var(--theme-border);
+  --color-theme-surface: var(--theme-surface);
+  --color-theme-chip-post: var(--theme-chip-post);
+  --color-theme-chip-note: var(--theme-chip-note);
+  --color-theme-highlight: var(--theme-highlight);
+}
+
+/* Theme color definitions */
+:root {
+  /* Light theme (default) */
+  --theme-bg: #fef9f6;
+  --theme-text: theme('colors.neutral.900');
+  --theme-text-secondary: theme('colors.neutral.600');
+  --theme-text-muted: theme('colors.neutral.400');
+  --theme-link: theme('colors.neutral.900');
+  --theme-link-hover: theme('colors.neutral.700');
+  --theme-border: theme('colors.neutral.800');
+  --theme-surface: theme('colors.gray.200');
+  --theme-highlight: theme('colors.yellow.300');
+  --theme-chip-post: theme('colors.amber.700');
+  --theme-chip-note: theme('colors.green.700');
+}
+
+.dark {
+  --theme-bg: #111110;
+  --theme-text: #eee;
+  --theme-text-secondary: theme('colors.neutral.400');
+  --theme-text-muted: theme('colors.neutral.500');
+  --theme-link: theme('colors.neutral.400');
+  --theme-link-hover: theme('colors.neutral.50');
+  --theme-border: theme('colors.neutral.300');
+  --theme-surface: theme('colors.neutral.700');
+  --theme-highlight: theme('colors.yellow.300');
+  --theme-chip-post: theme('colors.amber.300');
+  --theme-chip-note: theme('colors.green.300');
+}
+
+.blue {
+  --theme-bg: #2469d6;
+  --theme-text: white;
+  --theme-text-secondary: theme('colors.gray.300');
+  --theme-text-muted: theme('colors.neutral.300');
+  --theme-link: theme('colors.neutral.200');
+  --theme-link-hover: white;
+  --theme-border: theme('colors.neutral.300');
+  --theme-surface: theme('colors.blue.600');
+  --theme-highlight: theme('colors.yellow.300');
+  --theme-chip-post: theme('colors.amber.300');
+  --theme-chip-note: theme('colors.green.200');
+}
+
+html {
+  @apply antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply bg-theme-bg text-theme-text font-serif text-lg;
+}
+
+/* Scrollbar */
+* {
+  scrollbar-color: var(--color-zinc-300) var(--color-zinc-800);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar:horizontal {
+  height: 4px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: var(--color-zinc-800);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-zinc-800);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-zinc-800);
+}
+
+/* Styles for nprogress */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: #888;
+  opacity: 0.75;
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+}
+
+.post-year-title {
+  color: #333;
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #333;
+}
+
+.center-content {
+  @apply mx-auto w-full rounded-md shadow md:w-[calc(100%+0rem)] lg:w-[calc(100%+0rem)];
+}
+
+/* Use theme colors for prose elements */
+.prose,
+.prose p,
+.prose li,
+.prose blockquote,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.prose th,
+.prose td *,
+.prose code,
+.prose pre,
+.prose li {
+  color: var(--theme-text);
+}
+
+/* Inline code styling */
+.prose code:not(pre code) {
+  background-color: var(--theme-surface);
+  /* border: 1px solid var(--theme-border); */
+  border-radius: 0;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.875em;
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+/* Remove default backticks from Tailwind prose */
+.prose code::before,
+.prose code::after {
+  content: none !important;
+}
+
+/* Text selection highlighting */
+::selection {
+  background-color: var(--theme-highlight);
+  color: black;
+}
+
+::-moz-selection {
+  background-color: var(--theme-highlight);
+  color: black;
+}
+
+/* Global link styles - rectangular design */
+a {
+  display: inline-block;
+  padding: 0.1rem 0.25rem;
+  color: var(--theme-text);
+  transition: all 0.2s ease-in-out;
+  /* text-decoration: none; */
+}
+
+/* Enhanced focus ring styles for accessibility */
+a:focus {
+  outline: 2px solid var(--theme-text);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--theme-text);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove focus outline when not using keyboard */
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Enhanced focus styles for interactive elements */
+/* button:focus,
+button:focus-visible,
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: 2px solid var(--theme-text);
+  outline-offset: 2px;
+  border-radius: 4px;
+} */
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode support */
+/* @media (prefers-contrast: high) {
+  a:focus,
+  a:focus-visible,
+  button:focus,
+  button:focus-visible,
+  input:focus,
+  input:focus-visible,
+  textarea:focus,
+  textarea:focus-visible,
+  select:focus,
+  select:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+} */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen reader only utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Hover styles - inverted colors based on theme */
+/* Light theme: dark background on hover */
+:root a:hover {
+  background-color: var(--theme-text);
+  border-color: var(--theme-text);
+  color: white;
+}
+
+/* Dark and blue themes: light background on hover */
+.dark a:hover,
+.blue a:hover {
+  background-color: white;
+  border-color: white;
+  color: var(--theme-bg);
+}
+
+.tag-link {
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Light theme: white text on hover */
+:root .tag-link:hover {
+  color: white !important;
+}
+
+/* Dark and blue themes: theme background color text on hover */
+.dark .tag-link:hover,
+.blue .tag-link:hover {
+  color: var(--theme-bg) !important;
+}
+
+.transitioning-theme a,
+.transitioning-theme a:hover,
+.transitioning-theme a:focus,
+.transitioning-theme a:active {
+  background-color: transparent !important;
+  color: var(--theme-text) !important;
+  transition: none !important;
+  pointer-events: none !important;
+}
+
+/* Specifically target social icons and other interactive elements */
+.transitioning-theme .social-icon-link,
+.transitioning-theme .social-icon-link:hover,
+.transitioning-theme .social-icon-link:focus {
+  background-color: transparent !important;
+  color: var(--theme-text) !important;
+}

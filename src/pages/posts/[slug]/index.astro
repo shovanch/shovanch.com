@@ -1,0 +1,72 @@
+---
+import PostLayout from '~/layouts/post-layout.astro';
+import { getReadingTime } from '~/utils/reading-time';
+import { generateToc } from '~/utils/toc';
+import {
+  shouldGenerateStaticPath,
+  validateContentAccess,
+} from '~/utils/content-operations';
+
+import {
+  type CollectionEntry,
+  getCollection,
+  render,
+  getEntry,
+} from 'astro:content';
+// import { getReadingTime } from '@utils/index';
+type Props = CollectionEntry<'posts'>;
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+  return allPosts.filter(shouldGenerateStaticPath).map((post) => ({
+    params: {
+      id: post.id,
+      slug: post.id,
+    },
+    props: post,
+  }));
+}
+
+// 1. Get the slug from the incoming server request
+const { id: _id, slug } = Astro.params;
+
+if (slug === undefined) {
+  return Astro.redirect('/404');
+}
+
+// 2. Query for the entry directly using the request slug
+const post = await getEntry('posts', slug);
+
+// 3. Redirect if the entry does not exist
+if (post === undefined) {
+  return Astro.redirect('/404');
+}
+
+// 4. Validate access to this content
+try {
+  validateContentAccess(post);
+} catch {
+  return Astro.redirect('/404');
+}
+
+// 5. Render the entry to HTML in the template
+const { Content, headings } = await render(post);
+
+const readingTimeText = post.data.readingTime
+  ? `${post.data.readingTime} min read`
+  : post.body
+    ? getReadingTime(post.body)
+    : undefined;
+
+const tocHeadings = post.data.showToc ? generateToc(headings, 2, 2) : undefined;
+---
+
+<PostLayout
+  {...(({ readingTime: _, ...rest }) => rest)(post.data)}
+  headings={tocHeadings}
+  readingTime={readingTimeText}
+  slug={slug}
+  post={post}
+>
+  <Content frontmatter={post.data} />
+</PostLayout>

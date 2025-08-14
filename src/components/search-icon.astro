@@ -1,0 +1,23 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { UI_CONSTANTS } from '~/constants/ui-constants';
+
+type Props = HTMLAttributes<'svg'>;
+
+const { class: className = UI_CONSTANTS.ICON_SIZES.small, ...props } =
+  Astro.props;
+---
+
+<svg
+  class={className}
+  fill="none"
+  stroke="currentColor"
+  viewBox="0 0 24 24"
+  {...props}
+>
+  <path
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="2"
+    d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"></path>
+</svg>

@@ -1,0 +1,55 @@
+---
+import BaseLayout from '~/layouts/base-layout.astro';
+import { DynamicTOC } from '~/components/dynamic-toc';
+import { UI_CONSTANTS } from '~/constants/ui-constants';
+import type { TocHeading } from '~/utils/toc';
+
+type Props = {
+  title: string;
+  summary?: string;
+  publishedAt: string;
+  slug: string;
+  tags?: string[];
+  headings?: TocHeading[];
+  readingTime?: string;
+  showToc?: boolean;
+};
+
+const {
+  title,
+  summary,
+  publishedAt,
+  slug,
+  tags,
+  headings,
+  readingTime,
+  showToc,
+} = Astro.props;
+
+// Default reading time if not provided
+const defaultReadingTime = readingTime || '1 min read';
+---
+
+<BaseLayout
+  title={title}
+  summary={summary}
+  publishedAt={publishedAt}
+  slug={slug}
+  tags={tags}
+  readingTime={defaultReadingTime}
+  proseClass={UI_CONSTANTS.PROSE.default}
+>
+  <Fragment slot="toc">
+    {
+      showToc && headings && headings.length > 0 && (
+        <DynamicTOC
+          headings={headings}
+          readingTime={defaultReadingTime}
+          client:load
+        />
+      )
+    }
+  </Fragment>
+
+  <slot />
+</BaseLayout>

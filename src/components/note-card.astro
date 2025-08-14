@@ -1,0 +1,42 @@
+---
+import type { ObsidianNote } from '~/utils/get-obsidian-notes';
+import { formatDate } from '~/utils/format-date';
+
+type Props = {
+  post: ObsidianNote;
+};
+
+const { post } = Astro.props;
+---
+
+<li class="note-item" data-tags={post.data.tags?.join(',')}>
+  <div class="flex items-start justify-between gap-4">
+    <div class="min-w-0 flex-1">
+      <a
+        class="max-w-full truncate !pl-0 text-lg font-semibold break-words decoration-1 md:text-xl"
+        href={`/notes/${post.slug}`}
+        aria-label={`Read note: ${post.data.title}`}
+        title={post.data.title}
+      >
+        {post.data.title}
+      </a>
+      {
+        post.data.tags && post.data.tags.length > 0 && (
+          <div class="-mt-3.5 flex flex-wrap gap-2 md:-mt-4">
+            {post.data.tags.map((tag) => (
+              <a class="tag-link !pl-0 text-base" href={`/notes?tag=${tag}`}>
+                #{tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+    <time
+      datetime={post.data.publishedAt || ''}
+      class="text-theme-text-secondary flex-shrink-0 font-sans text-base font-medium"
+    >
+      {post.data.publishedAt ? formatDate(post.data.publishedAt) : ''}
+    </time>
+  </div>
+</li>

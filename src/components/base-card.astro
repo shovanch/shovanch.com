@@ -1,0 +1,133 @@
+---
+import { formatDate } from '~/utils/format-date';
+import { getReadingTime } from '~/utils/reading-time';
+import { extractExcerpt } from '~/utils/extract-excerpt';
+import { UI_CONSTANTS } from '~/constants/ui-constants';
+import type { ContentType } from '~/config/site';
+
+export type BaseCardProps = {
+  title: string;
+  href: string;
+  publishedAt: string;
+  body?: string;
+  tags?: string[];
+  renderOnClientRouter?: boolean;
+  contentType?: ContentType;
+  showExcerpt?: boolean;
+  showType?: boolean;
+};
+
+type Props = BaseCardProps;
+
+const {
+  title,
+  href,
+  publishedAt,
+  body = '',
+  tags,
+  renderOnClientRouter = true,
+  contentType = 'post',
+  showExcerpt = true,
+  showType = false,
+} = Astro.props;
+
+const readingTime = getReadingTime(body);
+const excerpt = showExcerpt ? extractExcerpt(body) : null;
+const linkProps = renderOnClientRouter ? {} : { 'data-astro-reload': '' };
+const ariaLabel = `Read ${contentType}: ${title}`;
+---
+
+<li
+  class="writing-item flex w-full flex-col text-lg md:text-xl"
+  data-tags={tags?.join(',') || ''}
+>
+  <p
+    class="!text-theme-text-secondary relative block space-x-0.5 font-sans text-base font-medium md:space-x-1"
+  >
+    {
+      showType && (
+        <>
+          <span
+            class="font-serif font-semibold italic"
+            style={`color: var(--theme-chip-${contentType})`}
+          >
+            {contentType === 'post' ? 'Post' : 'Note'}
+          </span>
+          <span class="text-theme-text-secondary" aria-hidden="true">
+            •
+          </span>
+        </>
+      )
+    }
+    <time datetime={publishedAt}>{formatDate(publishedAt)}</time>
+    {
+      readingTime && (
+        <>
+          <span class="text-theme-text-secondary" aria-hidden="true">
+            •
+          </span>
+          <span class="sr-only">Reading time:</span>
+          <span>{readingTime}</span>
+        </>
+      )
+    }
+    {
+      tags && tags.length > 0 && (
+        <span class="!text-theme-text-secondary inline-block items-center font-sans text-base font-medium md:space-x-0.5">
+          <span class="text-theme-text-secondary" aria-hidden="true">
+            •
+          </span>
+          {tags.map((tag, index) => (
+            <a
+              href={
+                contentType === 'post'
+                  ? `/posts?tag=${tag}`
+                  : `/notes?tag=${tag}`
+              }
+              class={`tag-link pl-0 ${index > 0 ? '!hidden md:!inline' : ''}`}
+            >
+              #{tag}
+            </a>
+          ))}
+        </span>
+      )
+    }
+  </p>
+  <a
+    class:list={[
+      'group relative block border-none bg-transparent !pl-0 font-serif text-lg font-semibold decoration-1 underline-offset-2 md:text-xl',
+      showType
+        ? 'w-full flex-shrink-0 truncate md:w-max'
+        : 'w-max flex-shrink-0',
+    ]}
+    href={href}
+    {...linkProps}
+    aria-label={ariaLabel}
+    title={showType ? title : undefined}
+  >
+    {title}
+  </a>
+
+  {
+    excerpt && (
+      <div class="mt-2 hidden md:block">
+        <p
+          class:list={[
+            UI_CONSTANTS.PROSE.default,
+            'line-clamp-2 max-w-none font-serif text-pretty',
+          ]}
+        >
+          {excerpt}
+        </p>
+        <a
+          href={href}
+          {...linkProps}
+          class="text-theme-text-secondary hover:text-theme-text mt-1 inline-block font-serif text-sm italic transition-colors duration-200"
+          aria-label={ariaLabel}
+        >
+          Continue reading
+        </a>
+      </div>
+    )
+  }
+</li>

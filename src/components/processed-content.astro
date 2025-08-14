@@ -1,0 +1,18 @@
+---
+const { html } = Astro.props;
+
+// Post-process the HTML to convert Obsidian syntax
+function processObsidianHTML(htmlContent: string): string {
+  // Convert <p>![[image.webp]]</p> to <img> tags
+  return htmlContent.replace(
+    /<p>!\[\[([^\]]+)\]\]<\/p>/g,
+    (_match, imageName) => {
+      return `<img src="/notes/assets/${imageName}" alt="${imageName}" />`;
+    },
+  );
+}
+
+const processedHTML = processObsidianHTML(html);
+---
+
+<Fragment set:html={processedHTML} />

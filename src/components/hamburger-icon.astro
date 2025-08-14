@@ -1,0 +1,67 @@
+---
+type Props = {
+  isOpen?: boolean;
+  class?: string;
+};
+
+const { isOpen = false, class: className = '' } = Astro.props;
+---
+
+<button
+  id="mobile-menu-button"
+  aria-label="Toggle mobile menu"
+  aria-expanded={isOpen}
+  class={`relative z-50 flex h-10 w-10 flex-col items-center justify-center transition-colors duration-300 hover:bg-gray-800/20 ${className}`}
+>
+  <div class="hamburger-icon">
+    <span class="hamburger-line hamburger-line-1"></span>
+    <span class="hamburger-line hamburger-line-2"></span>
+    <span class="hamburger-line hamburger-line-3"></span>
+  </div>
+</button>
+
+<style>
+  .hamburger-icon {
+    position: relative;
+    height: 1.25rem; /* 20px */
+    width: 1.5rem; /* 24px */
+  }
+
+  .hamburger-line {
+    position: absolute;
+    left: 0;
+    height: 0.125rem; /* 2px */
+    width: 100%;
+    background-color: var(--theme-text, #000);
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .hamburger-line-1 {
+    top: 0.25rem; /* 4px */
+  }
+
+  .hamburger-line-2 {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .hamburger-line-3 {
+    bottom: 0.25rem; /* 4px */
+  }
+
+  /* Open state animations */
+  .mobile-menu-open .hamburger-line-1 {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .mobile-menu-open .hamburger-line-2 {
+    opacity: 0;
+  }
+
+  .mobile-menu-open .hamburger-line-3 {
+    bottom: 50%;
+    transform: translateY(50%) rotate(-45deg);
+  }
+</style>

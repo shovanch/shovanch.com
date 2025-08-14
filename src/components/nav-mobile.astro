@@ -1,0 +1,35 @@
+---
+import { MobileMenu } from './mobile-menu.tsx';
+---
+
+<nav
+  class="flex w-full flex-row items-center justify-between md:hidden"
+  aria-label="Mobile navigation"
+>
+  <!-- Left side: Mobile menu (React component) -->
+  <div class="flex items-center">
+    <MobileMenu client:load />
+  </div>
+
+  <!-- Right side: External navigation -->
+  <div
+    class="flex items-center gap-4 font-medium lowercase"
+    role="group"
+    aria-label="Quick navigation links"
+  >
+    <a
+      href="/about"
+      class="focus:ring-theme-text px-2 py-1 font-sans text-lg md:text-xl"
+      aria-label="About page"
+    >
+      About
+    </a>
+    <a
+      href="/search"
+      class="focus:ring-theme-text px-2 py-1 font-sans text-lg md:text-xl"
+      aria-label="Writings page"
+    >
+      Writings
+    </a>
+  </div>
+</nav>

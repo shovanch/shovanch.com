@@ -1,0 +1,52 @@
+---
+import BaseLayout from '~/layouts/base-layout.astro';
+import { DynamicTOC } from '~/components/dynamic-toc';
+import RelatedPosts from '~/components/related-posts.astro';
+import type { Post } from '~/content.config';
+
+// Layout prop types that extend content types
+export type PostLayoutProps = Omit<Post['data'], 'readingTime'> & {
+  slug: string;
+  readingTime?: string;
+  articleClass?: string;
+  proseClass?: string;
+  post?: Post;
+};
+
+type Props = PostLayoutProps;
+
+const {
+  title,
+  readingTime,
+  summary,
+  headings,
+  showToc,
+  publishedAt,
+  slug,
+  tags,
+  post,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  summary={summary}
+  publishedAt={publishedAt}
+  slug={slug}
+  tags={tags}
+  readingTime={readingTime}
+>
+  <Fragment slot="toc">
+    {
+      showToc && headings && headings.length > 0 && (
+        <DynamicTOC headings={headings} readingTime={readingTime} client:load />
+      )
+    }
+  </Fragment>
+
+  <slot />
+
+  <Fragment slot="related">
+    {post && <RelatedPosts current={post} />}
+  </Fragment>
+</BaseLayout>

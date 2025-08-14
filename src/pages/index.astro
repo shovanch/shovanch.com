@@ -1,0 +1,78 @@
+---
+import BaseHead from '~/components/base-head.astro';
+import { defaultMeta } from '~/config/site';
+import RootLayout from '~/layouts/root-layout.astro';
+import Navigation from '~/components/nav.astro';
+import { Image } from 'astro:assets';
+import Writings from '~/components/writings.astro';
+import HeaderBackground from '~/components/header-background.astro';
+import SocialLinks from '~/components/social-links.astro';
+import { UI_CONSTANTS } from '~/constants/ui-constants';
+---
+
+<!doctype html>
+<html lang="en" class="overflow-x-hidden">
+  <head>
+    <BaseHead title={defaultMeta.title} description={defaultMeta.description} />
+  </head>
+  <div class="absolute top-0 left-0 z-0 w-screen overflow-hidden text-red-400">
+    <HeaderBackground />
+  </div>
+
+  <RootLayout>
+    <Navigation />
+
+    <section class="mt-4 -mb-4 flex flex-row items-center gap-4 md:mt-8">
+      <Image
+        priority
+        src="/images/avatar.webp"
+        alt="Shovan Chatterjee"
+        class="h-20 w-20 rounded-full border-4 border-neutral-200 bg-[#fca5a5] object-cover shadow md:h-24 md:w-24"
+        width="96"
+        height="96"
+      />
+      <div class="flex flex-col">
+        <h2 class="font-serif text-2xl font-semibold md:text-[1.75rem]">
+          Shovan Chatterjee
+        </h2>
+        <div class="flex flex-row items-center gap-2.5 md:-mt-1">
+          <p class="font-sans font-medium opacity-75 md:text-lg">
+            Engineer, Tinkerer, Explorer
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="flex flex-col gap-8 font-serif md:gap-6">
+      <div
+        class:list={[
+          UI_CONSTANTS.PROSE.default,
+          'prose-p:my-1 prose-p:md:my-1.5 max-w-none text-pretty',
+        ]}
+      >
+        <p>Hi, I’m Shovan!</p>
+        <p>
+          I’m a <strong>software engineer</strong> focused on building for the web.
+        </p>
+        <p>
+          I work with <strong>full-stack TypeScript</strong> using React, Next.js,
+          Node.js, and TanStack.
+        </p>
+        <a
+          href="/about"
+          class="not-prose hover:decoration-theme-text !pl-0 text-lg font-medium italic"
+          aria-label="More about me"
+        >
+          <span
+            class="decoration mr-1 inline-block underline decoration-dashed underline-offset-4"
+            >More about me
+          </span> →
+        </a>
+      </div>
+
+      <SocialLinks />
+    </section>
+
+    <Writings />
+  </RootLayout>
+</html>

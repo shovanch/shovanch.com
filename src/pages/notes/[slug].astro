@@ -1,0 +1,85 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render as renderMarkdown } from 'astro:content';
+import { getReadingTime } from '~/utils/reading-time';
+import { generateToc } from '~/utils/toc';
+import { generateSlugFromId, extractTitleFromId } from '~/utils/slug-mapping';
+import {
+  shouldGenerateStaticPath,
+  validateContentAccess,
+} from '~/utils/content-operations';
+import NoteLayout from '~/layouts/note-layout.astro';
+
+export const getStaticPaths = (async () => {
+  const notes = await getCollection('notes');
+
+  return notes
+    .filter((note) => {
+      // Filter out system files
+      const isSystemFile =
+        note.id.startsWith('.') ||
+        note.id.includes('/.') ||
+        note.id.startsWith('Excalidraw/') ||
+        note.id.includes('excalidraw/') ||
+        note.id.startsWith('note-template/') ||
+        note.id.includes('.excalidraw') ||
+        note.id.includes('Untitled') ||
+        note.id.includes('Drawing ');
+
+      if (isSystemFile) return false;
+
+      // Also filter by publication status for static generation
+      return shouldGenerateStaticPath(note);
+    })
+    .map((note) => ({
+      params: { slug: note.data.slug || generateSlugFromId(note.id) },
+      props: { note },
+    }));
+}) satisfies GetStaticPaths;
+
+const { note } = Astro.props;
+
+// Validate access to this content
+try {
+  validateContentAccess(note);
+} catch {
+  return Astro.redirect('/404');
+}
+
+// Render the content and extract headings
+const { Content, headings } = await renderMarkdown(note);
+
+// Calculate reading time and generate TOC
+const readingTime = getReadingTime(note.body || '');
+const tocHeadings =
+  (note.data.showToc ?? true) ? generateToc(headings, 2, 6) : undefined;
+
+// Get valid date - ensure it's in YYYY-MM-DD format
+let publishedAt: string;
+if (
+  note.data.publishedAt &&
+  !note.data.publishedAt.toString().startsWith('0002-')
+) {
+  // Always convert to YYYY-MM-DD format regardless of input type
+  const dateValue =
+    typeof note.data.publishedAt === 'string'
+      ? note.data.publishedAt.split('T')[0] // Remove time part if present
+      : new Date(note.data.publishedAt).toISOString().split('T')[0];
+  publishedAt = dateValue;
+} else {
+  publishedAt = new Date().toISOString().split('T')[0];
+}
+---
+
+<NoteLayout
+  title={note.data.title || extractTitleFromId(note.id)}
+  summary=""
+  publishedAt={publishedAt}
+  tags={note.data.tags || []}
+  slug={note.data.slug || generateSlugFromId(note.id)}
+  showToc={note.data.showToc ?? true}
+  headings={tocHeadings}
+  readingTime={readingTime}
+>
+  <Content />
+</NoteLayout>

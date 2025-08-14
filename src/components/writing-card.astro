@@ -1,0 +1,37 @@
+---
+import BaseCard from '~/components/base-card.astro';
+import type { ObsidianNote } from '~/utils/get-obsidian-notes';
+import type { PostWithType } from '~/content.config';
+
+// Union type for both posts and notes
+type NoteWithType = ObsidianNote & { type: 'note' };
+type Writing = PostWithType | NoteWithType;
+
+type Props = {
+  post: Writing;
+};
+
+const { post } = Astro.props;
+
+// Type guard
+const isPost = (post: Writing): post is PostWithType => post.type === 'post';
+
+const renderOnClientRouter = isPost(post)
+  ? post.data.renderOnClientRouter
+  : true;
+const href = isPost(post) ? `/posts/${post.id}` : `/notes/${post.slug}`;
+const contentType = isPost(post) ? 'post' : 'note';
+const showExcerpt = isPost(post); // Only show excerpts for posts
+---
+
+<BaseCard
+  title={post.data.title || 'Untitled'}
+  href={href}
+  publishedAt={post.data.publishedAt || ''}
+  body={post.body}
+  tags={post.data.tags}
+  renderOnClientRouter={renderOnClientRouter}
+  contentType={contentType}
+  showExcerpt={showExcerpt}
+  showType={true}
+/>

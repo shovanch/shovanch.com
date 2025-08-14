@@ -1,0 +1,22 @@
+---
+import type { TocHeading } from '~/utils/toc';
+
+type Props = TocHeading;
+
+const { slug, text, children } = Astro.props;
+---
+
+<li>
+  <a href={'#' + slug}>
+    {text}
+  </a>
+  {
+    !!children?.length && (
+      <ul>
+        {children.map((toc) => (
+          <Astro.self {...toc} />
+        ))}
+      </ul>
+    )
+  }
+</li>

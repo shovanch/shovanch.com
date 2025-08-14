@@ -1,0 +1,220 @@
+---
+import Navigation from '~/components/nav.astro';
+import BaseHead from '~/components/base-head.astro';
+import { defaultMeta } from '~/config/site';
+import RootLayout from '~/layouts/root-layout.astro';
+import { getObsidianNotes } from '~/utils/get-obsidian-notes';
+import NoteCard from '~/components/note-card.astro';
+import { filterAndSortContent } from '~/utils/content-operations';
+import MobileTagsFilter from '~/components/mobile-tags-filter.astro';
+
+const allNotes = await getObsidianNotes();
+const filteredNotes = filterAndSortContent(allNotes);
+
+// Use filtered notes directly without year grouping
+const sortedNotes = filteredNotes;
+
+// Get all unique tags with counts
+const tagCounts = filteredNotes.reduce(
+  (acc, note) => {
+    if (note.data.tags) {
+      note.data.tags.forEach((tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+      });
+    }
+    return acc;
+  },
+  {} as Record<string, number>,
+);
+
+const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title="Notes  •  Shovan Chatterjee"
+      description={defaultMeta.description}
+    />
+  </head>
+  <RootLayout>
+    <Navigation />
+
+    <main class="flex w-full flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-theme-text font-sans text-4xl font-semibold">Notes</h1>
+        <p class="text-theme-text-secondary text-lg">
+          Quick thoughts and discoveries from my learning journey.
+        </p>
+      </div>
+
+      <!-- Mobile Tags Filter -->
+      <MobileTagsFilter
+        tags={sortedTags}
+        totalCount={filteredNotes.length}
+        mode="simple"
+        showCloseIcons={true}
+      />
+
+      <div class="relative">
+        <!-- Notes Section -->
+        <div
+          class="prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2 flex w-full flex-col md:mt-2"
+        >
+          <div id="notes-container">
+            <ul class="not-prose flex flex-col gap-3 pl-0">
+              {sortedNotes.map((note) => <NoteCard post={note} />)}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Desktop Tags Sidebar -->
+        <aside class="absolute top-0 -right-[25%] hidden w-48 md:block">
+          <div class="sticky top-8">
+            <div class="flex flex-col text-right text-base">
+              <button
+                class="tag-filter text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center justify-end gap-1 py-1 outline-none focus:outline-none"
+                data-tag="all"
+              >
+                <span>All</span>
+                <span class="text-theme-text-secondary"
+                  >{filteredNotes.length}</span
+                >
+              </button>
+              {
+                sortedTags.map(([tag, count]) => (
+                  <button
+                    class="tag-filter text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center justify-end gap-1 py-1 outline-none focus:outline-none"
+                    data-tag={tag}
+                  >
+                    <span class="">#{tag}</span>
+                    <span class="text-theme-text-secondary">{count}</span>
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <script>
+      // Wait for DOM to be fully loaded
+      document.addEventListener('DOMContentLoaded', function () {
+        // Tag filtering functionality with URL parameter support
+        const tagFilters = document.querySelectorAll('.tag-filter');
+        const noteItems = document.querySelectorAll('.note-item');
+
+        // Function to get URL parameter
+        function getUrlParam(param: string): string | null {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get(param);
+        }
+
+        // Function to set URL parameter
+        function setUrlParam(param: string, value: string): void {
+          const url = new URL(window.location.href);
+          if (value === 'all') {
+            url.searchParams.delete(param);
+          } else {
+            url.searchParams.set(param, value);
+          }
+          window.history.pushState({}, '', url.toString());
+        }
+
+        // Function to apply filter
+        function applyFilter(selectedTag: string): void {
+          const tag = selectedTag || 'all';
+
+          // Reset all notes to visible first
+          noteItems.forEach((item) => {
+            if (item && (item as HTMLElement).style) {
+              (item as HTMLElement).style.display = 'block';
+            }
+          });
+
+          // Update active states for all filters
+          tagFilters.forEach((f) => {
+            // Reset desktop styles
+            f.classList.remove('text-theme-text', 'font-bold');
+            f.classList.add('text-theme-text-secondary');
+
+            // Reset mobile styles
+            f.classList.remove(
+              'font-bold',
+              'text-theme-text',
+              'border-theme-text',
+            );
+            f.classList.add(
+              'font-normal',
+              'text-theme-text-secondary',
+              'border-theme-border',
+            );
+          });
+
+          // Find and activate the correct filter
+          const activeFilters = Array.from(tagFilters).filter(
+            (f) => (f as HTMLElement).dataset && (f as HTMLElement).dataset!.tag === tag,
+          );
+          activeFilters.forEach((activeFilter) => {
+            // Desktop active styles (only for desktop sidebar)
+            if (activeFilter.closest('aside')) {
+              activeFilter.classList.remove('text-theme-text-secondary');
+              activeFilter.classList.add('text-theme-text', 'font-bold');
+            }
+
+            // Mobile active styles (only for mobile filter)
+            if (!activeFilter.closest('aside')) {
+              activeFilter.classList.remove(
+                'font-normal',
+                'text-theme-text-secondary',
+                'border-theme-border',
+              );
+              activeFilter.classList.add(
+                'font-bold',
+                'text-theme-text',
+                'border-theme-text',
+              );
+            }
+          });
+
+          // Filter notes only if not "all"
+          if (tag !== 'all') {
+            noteItems.forEach((item) => {
+              const noteTags =
+                (item as HTMLElement).dataset && (item as HTMLElement).dataset.tags
+                  ? (item as HTMLElement).dataset.tags!.split(',')
+                  : [];
+
+              if (!noteTags.includes(tag) && (item as HTMLElement).style) {
+                (item as HTMLElement).style.display = 'none';
+              }
+            });
+          }
+        }
+
+        // Initialize filter based on URL parameter on page load
+        const initialTag = getUrlParam('tag');
+        applyFilter(initialTag || 'all');
+
+        // Add click event listeners
+        tagFilters.forEach((filter) => {
+          filter.addEventListener('click', () => {
+            const selectedTag = (filter as HTMLElement).dataset && (filter as HTMLElement).dataset.tag;
+            if (selectedTag) {
+              setUrlParam('tag', selectedTag);
+              applyFilter(selectedTag);
+            }
+          });
+        });
+
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', () => {
+          const tag = getUrlParam('tag');
+          applyFilter(tag || 'all');
+        });
+      });
+    </script>
+  </RootLayout>
+</html>

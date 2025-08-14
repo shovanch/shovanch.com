@@ -1,0 +1,6 @@
+[submodule "src/content/notes"]
+	path = src/content/notes
+	url = https://github.com/shovanch/shovanch.com-vault.git
+[submodule "src/content/posts"]
+	path = src/content/posts
+	url = https://github.com/shovanch/shovanch.com-posts.git

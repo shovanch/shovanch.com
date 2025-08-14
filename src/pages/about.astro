@@ -1,0 +1,37 @@
+---
+import BaseHead from '~/components/base-head.astro';
+import { defaultMeta } from '~/config/site';
+import RootLayout from '~/layouts/root-layout.astro';
+import Navigation from '~/components/nav.astro';
+import { getEntry, render } from 'astro:content';
+import { UI_CONSTANTS } from '~/constants/ui-constants';
+
+// Load the about content from notes collection
+let aboutEntry =
+  (await getEntry('notes', 'about/About')) ||
+  (await getEntry('notes', 'about/about')) ||
+  (await getEntry('notes', 'About')) ||
+  (await getEntry('notes', 'about'));
+if (!aboutEntry) {
+  throw new Error('About page content not found');
+}
+const { Content } = await render(aboutEntry);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title="About  •  Shovan Chatterjee"
+      description={defaultMeta.description}
+    />
+  </head>
+
+  <RootLayout>
+    <Navigation />
+
+    <article class:list={[UI_CONSTANTS.PROSE.default, 'mt-8 md:mt-16']}>
+      <Content />
+    </article>
+  </RootLayout>
+</html>

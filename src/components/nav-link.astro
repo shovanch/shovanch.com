@@ -1,0 +1,37 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'a'>;
+
+const { href, class: className, ...props } = Astro.props;
+
+const { pathname } = Astro.url;
+const subpath = pathname.match(/[^\/]+/g);
+const isActive = href === pathname || href === `/${subpath?.[0]}`;
+const isHome = href === '/';
+const shouldShowActiveStyle = isActive && !isHome;
+---
+
+<a
+  href={href}
+  class={`font-sans text-lg md:text-xl ${shouldShowActiveStyle ? 'active-nav-link' : ''}`}
+  aria-current={isActive ? 'page' : undefined}
+  {...props}
+>
+  <slot />
+</a>
+
+<style is:global>
+  .active-nav-link {
+    background-color: var(--theme-text);
+    border-color: var(--theme-text);
+    color: white;
+  }
+
+  .dark .active-nav-link,
+  .blue .active-nav-link {
+    background-color: white;
+    border-color: white;
+    color: var(--theme-bg);
+  }
+</style>

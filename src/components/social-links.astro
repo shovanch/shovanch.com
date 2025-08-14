@@ -1,0 +1,218 @@
+---
+import { socialLinks } from '~/config/site';
+import EmailIcon from '~/components/email-icon.astro';
+import TwitterIcon from '~/components/twitter-icon.astro';
+import GitHubIcon from '~/components/github-icon.astro';
+import RSSIcon from '~/components/rss-icon.astro';
+import LinkedInIcon from '~/components/linkedin-icon.astro';
+
+export interface Props {
+  location?: 'default' | 'footer';
+}
+
+const { location = 'default' } = Astro.props;
+
+const getIconComponent = (label: string) => {
+  switch (label) {
+    case 'email':
+      return EmailIcon;
+    case 'twitter':
+      return TwitterIcon;
+    case 'github':
+      return GitHubIcon;
+    case 'rss':
+      return RSSIcon;
+    case 'linkedin':
+      return LinkedInIcon;
+    default:
+      return null;
+  }
+};
+
+// Icon size based on location
+const iconSize = location === 'footer' ? 'h-8 w-8' : 'h-8 w-8 md:h-10 md:w-10';
+
+// Randomize transform rotations
+const rotationValues = [-1.5, 1.5, 0, -1, 1]; // degrees
+const shuffledRotations = [...rotationValues].sort(() => Math.random() - 0.5);
+const iconRotations: Record<string, number> = {};
+
+socialLinks.forEach((link, index) => {
+  if (index < shuffledRotations.length) {
+    iconRotations[link.label] = shuffledRotations[index];
+  }
+});
+---
+
+<style>
+  .social-icon-link {
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    opacity: 1;
+  }
+
+  /* Ensure button has same styling as links */
+  button.social-icon-link {
+    /* opacity: inherit from .social-icon-link */
+    /* color: var(--theme-link); */
+    font: inherit;
+    background: none;
+    border: none;
+    outline: inherit;
+  }
+  /*
+  button.social-icon-link svg {
+    opacity: 1;
+  } */
+
+  /* Theme-specific button styling */
+  /* .dark button.social-icon-link {
+    color: white !important;
+  }
+
+  .blue button.social-icon-link {
+    color: var(--theme-link);
+  } */
+
+  .social-icon-link:hover {
+    color: var(--theme-link-hover);
+    background-color: transparent;
+    transform: scale(1.1) rotate(0deg);
+    opacity: 1; /* Full opacity on hover for all themes */
+  }
+  .dark .social-icon-link:hover,
+  .blue .social-icon-link:hover {
+    color: var(--theme-link-hover);
+    background-color: transparent;
+    transform: scale(1.1) rotate(0deg);
+  }
+
+  /* Tooltip styles */
+  .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--theme-text);
+    color: var(--theme-bg);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: var(--font-sans);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--theme-text);
+  }
+
+  .social-icon-link:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-4px);
+  }
+
+  /* Success message for email copy */
+  .tooltip.success {
+    background: #22c55e;
+    color: white;
+  }
+  .tooltip.success::after {
+    border-top-color: #22c55e;
+  }
+</style>
+
+<script is:inline>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function copyEmail(email, buttonElement) {
+    navigator.clipboard
+      .writeText(email)
+      .then(function () {
+        const tooltip = buttonElement.querySelector('.tooltip');
+        const originalText = tooltip.textContent;
+        tooltip.textContent = 'Email copied';
+        tooltip.classList.add('success');
+
+        setTimeout(function () {
+          tooltip.textContent = originalText;
+          tooltip.classList.remove('success');
+        }, 2000);
+      })
+      .catch(function (err) {
+        console.error('Failed to copy email: ', err);
+      });
+  }
+</script>
+
+<div id="social-links" class="flex flex-row flex-wrap gap-x-4 gap-y-2">
+  {
+    socialLinks.map((link) => {
+      const IconComponent = getIconComponent(link.label);
+      const isEmail = link.label === 'email';
+      let displayName;
+      switch (link.label) {
+        case 'github':
+          displayName = 'GitHub';
+          break;
+        case 'linkedin':
+          displayName = 'LinkedIn';
+          break;
+        case 'twitter':
+          displayName = 'Twitter';
+          break;
+        case 'rss':
+          displayName = 'RSS';
+          break;
+        case 'email':
+          displayName = 'Copy Email';
+          break;
+        default:
+          displayName = '';
+      }
+
+      return IconComponent ? (
+        isEmail ? (
+          <button
+            class={`social-icon-link social-icon-${link.label} hover:!text-theme-link-hover text-theme-link/95 inline-flex cursor-pointer items-center justify-center border-none !bg-transparent !p-0 hover:!bg-transparent`}
+            style={`transform: rotate(${iconRotations[link.label] || 0}deg)`}
+            onclick={`copyEmail('${link.url.replace('mailto:', '')}', this)`}
+            aria-label="Copy email address"
+          >
+            <IconComponent class={`${iconSize} fill-current`} />
+            <span class="tooltip">{displayName}</span>
+          </button>
+        ) : (
+          <a
+            href={link.url}
+            class={`social-icon-link social-icon-${link.label} !text-theme-link/95 hover:!text-theme-link-hover inline-flex items-center justify-center !bg-transparent !p-0 hover:!bg-transparent`}
+            style={`transform: rotate(${iconRotations[link.label] || 0}deg)`}
+            target="_blank"
+            title={displayName}
+          >
+            <IconComponent class={`${iconSize} fill-current`} />
+            <span class="tooltip">{displayName}</span>
+          </a>
+        )
+      ) : (
+        <a
+          href={link.url}
+          class="text-theme-link hover:text-theme-link-hover font-sans font-semibold decoration-wavy underline-offset-2 hover:underline md:text-lg"
+          target="_blank"
+        >
+          {link.label}
+        </a>
+      );
+    })
+  }
+</div>

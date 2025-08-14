@@ -1,0 +1,168 @@
+---
+const uniqueId = `theme-switcher-${Math.random().toString(36).substring(2, 11)}`;
+---
+
+<fieldset class="flex items-center gap-2" id={uniqueId} role="radiogroup">
+  <legend class="sr-only">Choose theme</legend>
+  <button
+    data-theme="blue"
+    class="h-5 w-5 rounded-full border-2 border-gray-300 bg-[#2469d6] transition-all duration-200 hover:scale-110 focus:ring-2 focus:ring-[#2469d6] focus:ring-offset-2 focus:outline-none"
+    aria-label="Switch to blue theme"
+    aria-checked="false"
+    role="radio"
+    tabindex="0"></button>
+  <button
+    data-theme="light"
+    class="h-5 w-5 rounded-full border-2 border-neutral-500 bg-[#fef9f6] transition-all duration-200 hover:scale-110 focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:outline-none"
+    aria-label="Switch to light theme"
+    aria-checked="false"
+    role="radio"
+    tabindex="-1"></button>
+  <button
+    data-theme="dark"
+    class="h-5 w-5 rounded-full border-2 border-gray-300 bg-black transition-all duration-200 hover:scale-110 focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:outline-none"
+    aria-label="Switch to dark theme"
+    aria-checked="false"
+    role="radio"
+    tabindex="-1"></button>
+</fieldset>
+
+<script>
+  type Theme = 'light' | 'dark' | 'blue';
+
+  function setTheme(theme: Theme): void {
+    const html = document.documentElement;
+
+    // Add transitioning class to prevent link highlights during theme change
+    html.classList.add('transitioning-theme');
+
+    // Remove all theme classes
+    html.classList.remove('dark', 'blue');
+
+    // Add the appropriate class for non-light themes
+    if (theme === 'dark') {
+      html.classList.add('dark');
+    } else if (theme === 'blue') {
+      html.classList.add('blue');
+    }
+
+    // Store in localStorage
+    localStorage.setItem('theme', theme);
+
+    // Update ARIA states for all theme switchers
+    updateThemeSwitcherStates(theme);
+
+    // Announce theme change to screen readers
+    announceThemeChange(theme);
+
+    // Remove transitioning class after a brief delay
+    setTimeout(() => {
+      html.classList.remove('transitioning-theme');
+    }, 150);
+  }
+
+  function updateThemeSwitcherStates(currentTheme: Theme): void {
+    const switchers = document.querySelectorAll('[id^="theme-switcher-"]');
+
+    switchers.forEach((switcher) => {
+      const buttons = switcher.querySelectorAll('button[data-theme]');
+      buttons.forEach((button) => {
+        const theme = (button as HTMLElement).dataset.theme as Theme;
+        const isActive = theme === currentTheme;
+
+        button.setAttribute('aria-checked', isActive.toString());
+        button.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+    });
+  }
+
+  function announceThemeChange(theme: Theme): void {
+    // Create or update a live region for screen reader announcements
+    let liveRegion = document.getElementById('theme-announcement');
+    if (!liveRegion) {
+      liveRegion = document.createElement('div');
+      liveRegion.id = 'theme-announcement';
+      liveRegion.setAttribute('aria-live', 'polite');
+      liveRegion.setAttribute('aria-atomic', 'true');
+      liveRegion.className = 'sr-only';
+      document.body.appendChild(liveRegion);
+    }
+
+    liveRegion.textContent = `Theme changed to ${theme}`;
+  }
+
+  function switchToTheme(_event: MouseEvent, theme: Theme): void {
+    setTheme(theme);
+  }
+
+  function initThemeSwitcher(): void {
+    // Find all theme switchers on the page
+    const switchers = document.querySelectorAll('[id^="theme-switcher-"]');
+
+    switchers.forEach((switcher) => {
+      const buttons = switcher.querySelectorAll('button[data-theme]');
+
+      buttons.forEach((button, index) => {
+        // Only add event listener if not already added
+        if (!button.hasAttribute('data-listener-added')) {
+          button.addEventListener('click', (event) => {
+            const theme = (button as HTMLElement).dataset.theme as Theme;
+            switchToTheme(event as MouseEvent, theme);
+          });
+
+          // Add keyboard navigation
+          button.addEventListener('keydown', (event) => {
+            const keyEvent = event as KeyboardEvent;
+            const buttonsArray = Array.from(buttons);
+            let newIndex = index;
+
+            switch (keyEvent.key) {
+              case 'ArrowRight':
+              case 'ArrowDown':
+                keyEvent.preventDefault();
+                newIndex = (index + 1) % buttons.length;
+                (buttonsArray[newIndex] as HTMLElement).focus();
+                break;
+              case 'ArrowLeft':
+              case 'ArrowUp':
+                keyEvent.preventDefault();
+                newIndex = (index - 1 + buttons.length) % buttons.length;
+                (buttonsArray[newIndex] as HTMLElement).focus();
+                break;
+              case 'Enter':
+              case ' ':
+                keyEvent.preventDefault();
+                const theme = (button as HTMLElement).dataset.theme as Theme;
+                setTheme(theme);
+                break;
+            }
+          });
+
+          button.setAttribute('data-listener-added', 'true');
+        }
+      });
+    });
+
+    // Set initial ARIA states based on current theme
+    const currentTheme = getCurrentTheme();
+    updateThemeSwitcherStates(currentTheme);
+  }
+
+  function getCurrentTheme(): Theme {
+    const storedTheme = localStorage.getItem('theme') as Theme;
+    if (storedTheme) {
+      return storedTheme;
+    }
+
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+  }
+
+  initThemeSwitcher();
+
+  document.addEventListener('astro:after-swap', () => {
+    initThemeSwitcher();
+  });
+</script>

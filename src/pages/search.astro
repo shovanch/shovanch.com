@@ -1,0 +1,429 @@
+---
+import RootLayout from '~/layouts/root-layout.astro';
+import Nav from '~/components/nav.astro';
+import BaseHead from '~/components/base-head.astro';
+import { defaultMeta } from '~/config/site';
+import PagefindSearch from 'astro-pagefind/components/Search';
+import { getCollection } from 'astro:content';
+import { getObsidianNotes } from '~/utils/get-obsidian-notes';
+import Writings from '~/components/writings.astro';
+import { isDevEnv } from '~/utils/is-dev-env';
+import MobileTagsFilter from '~/components/mobile-tags-filter.astro';
+
+export const prerender = false;
+
+const query = Astro.url.searchParams.get('q') ?? undefined;
+
+// Fetch posts from content collection
+const posts = (await getCollection('posts')).filter((post) => {
+  if (isDevEnv) {
+    return true;
+  }
+  return post.data.isPublished;
+});
+
+// Fetch notes from Obsidian
+const notes = (await getObsidianNotes()).filter((note) => {
+  if (isDevEnv) {
+    return true;
+  }
+  return note.data.isPublished;
+});
+
+// Get all unique tags with counts from both posts and notes
+const tagCounts = [...posts, ...notes].reduce(
+  (acc, item) => {
+    if (item.data.tags) {
+      item.data.tags.forEach((tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+      });
+    }
+    return acc;
+  },
+  {} as Record<string, number>,
+);
+
+const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
+const totalWritings = posts.length + notes.length;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title="Search  •  Shovan Chatterjee"
+      description={defaultMeta.description}
+    />
+  </head>
+  <RootLayout>
+    <Nav />
+
+    <main class="flex w-full flex-col gap-6" role="main">
+      <header class="flex w-full flex-col gap-2">
+        <h1 class="text-theme-text font-sans text-3xl font-bold">Search</h1>
+        <p class="text-theme-text-secondary">
+          Search through all posts and pages on this site.
+        </p>
+      </header>
+
+      <section class="w-full" aria-label="Search interface">
+        <PagefindSearch
+          id="search"
+          query={query}
+          className="pagefind-ui"
+          uiOptions={{
+            showImages: false,
+            showSubResults: true,
+            excerptLength: 30,
+            resetStyles: true,
+          }}
+        />
+      </section>
+
+      <!-- Default content shown when no search is active -->
+      <div id="default-content" class={query ? 'hidden' : ''}>
+        <!-- Mobile Tags Filter -->
+        <MobileTagsFilter
+          tags={sortedTags}
+          totalCount={totalWritings}
+          mode="advanced"
+          showCloseIcons={true}
+        />
+
+        <div class="relative">
+          <!-- Writings Section -->
+          <div class="w-full">
+            <div
+              class="writings-section prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2"
+            >
+              <h2
+                id="writings-title"
+                class="text-theme-text font-sans text-lg md:text-2xl"
+              >
+                Writings
+              </h2>
+              <Writings />
+            </div>
+          </div>
+
+          <!-- Desktop Tags Sidebar -->
+          <aside
+            class="absolute top-0 -right-[25%] hidden w-48 md:block"
+            aria-label="Tag filters sidebar"
+          >
+            <div class="sticky top-8">
+              <nav
+                class="flex flex-col text-right text-base"
+                aria-label="Filter by tags"
+              >
+                <button
+                  class="tag-filter text-theme-text hover:text-theme-text focus:ring-theme-text flex cursor-pointer items-center justify-end gap-1 py-1"
+                  data-tag="all"
+                  aria-pressed="true"
+                  aria-label="Show all posts"
+                >
+                  <span>All</span>
+                  <span class="text-theme-text-secondary">{totalWritings}</span>
+                </button>
+                {
+                  sortedTags.map(([tag, count]) => (
+                    <button
+                      class="tag-filter text-theme-text-secondary hover:text-theme-text focus:ring-theme-text flex cursor-pointer items-center justify-end gap-1 py-1"
+                      data-tag={tag}
+                      aria-pressed="false"
+                      aria-label={`Filter by ${tag} tag (${count} posts)`}
+                    >
+                      <span class="">#{tag}</span>
+                      <span class="text-theme-text-secondary">{count}</span>
+                    </button>
+                  ))
+                }
+              </nav>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </RootLayout>
+</html>
+
+<style is:global>
+  @reference "../styles/global.css";
+
+  /* Pagefind CSS variables for clean theming */
+  :root {
+    --pagefind-ui-scale: 1;
+    --pagefind-ui-primary: var(--theme-text);
+    --pagefind-ui-text: var(--theme-text);
+    --pagefind-ui-message-text: var(--theme-text-secondary);
+    --pagefind-ui-result-title-text: var(--theme-text);
+    --pagefind-ui-result-text: var(--theme-text-secondary);
+    --pagefind-ui-background: transparent;
+    --pagefind-input-background: transparent;
+    --pagefind-ui-border: var(--theme-border);
+    --pagefind-ui-border-width: 0px;
+    --pagefind-ui-border-radius: 0px;
+    --pagefind-ui-font: var(--font-serif);
+    --pagefind-button-background: transparent;
+    --pagefind-button-color: var(--theme-text-secondary);
+  }
+
+  /* Theme-specific overrides for dark/blue modes */
+  .dark {
+    --pagefind-ui-primary: var(--theme-text);
+    --pagefind-ui-text: var(--theme-text);
+    --pagefind-ui-message-text: var(--theme-text-secondary);
+    --pagefind-ui-result-title-text: var(--theme-text);
+    --pagefind-ui-result-text: var(--theme-text-secondary);
+  }
+
+  .blue {
+    --pagefind-ui-primary: var(--theme-text);
+    --pagefind-ui-text: var(--theme-text);
+    --pagefind-ui-message-text: var(--theme-text-secondary);
+    --pagefind-ui-result-title-text: var(--theme-text);
+    --pagefind-ui-result-text: var(--theme-text-secondary);
+  }
+
+  /* Search input styling */
+  #search .pagefind-ui__search-input,
+  #search .pagefind-ui__search-clear {
+    @apply !pl-12 font-sans text-lg;
+  }
+
+  #search .pagefind-ui__search-input {
+    @apply border-theme-border mb-8 rounded-none border bg-transparent py-3 pr-4 pl-10 shadow-xs;
+  }
+
+  #search .pagefind-ui__form::before {
+    /* @apply !opacity-65; */
+  }
+
+  #search .pagefind-ui__search-input:focus {
+    @apply shadow-none outline-none;
+  }
+
+  #search .pagefind-ui__search-input::placeholder {
+    @apply text-theme-text-secondary font-sans;
+  }
+
+  /* Result styling - match post-card design */
+  #search .pagefind-ui__result {
+    @apply border-theme-text mb-6 rounded-none border-b bg-transparent pb-6;
+  }
+
+  #search .pagefind-ui__result:last-child {
+    @apply border-b-0;
+  }
+
+  /* Result title - serif font like post titles */
+  #search .pagefind-ui__result-title,
+  #search .pagefind-ui__result-link {
+    @apply text-theme-text mb-2 inline-block border-none bg-transparent px-1 py-0.5 pl-0 font-serif text-xl leading-snug font-bold no-underline transition-all duration-200 ease-in-out;
+  }
+
+  /* Light theme: dark background on hover */
+  :root #search .pagefind-ui__result-link:hover {
+    background-color: var(--theme-text);
+    border-color: var(--theme-text);
+    color: white;
+  }
+
+  /* Dark and blue themes: light background on hover */
+  .dark #search .pagefind-ui__result-link:hover,
+  .blue #search .pagefind-ui__result-link:hover {
+    background-color: white;
+    border-color: white;
+    color: var(--theme-bg);
+  }
+
+  /* Result excerpt - sans font like metadata */
+  #search .pagefind-ui__result-excerpt {
+    @apply text-theme-text-secondary mb-2 font-sans text-base leading-relaxed;
+  }
+
+  /* Result URL - sans font like metadata */
+  #search .pagefind-ui__result-url {
+    @apply text-theme-text-secondary -mt-2 font-sans text-sm font-normal;
+  }
+
+  /* Message styling */
+  #search .pagefind-ui__message {
+    @apply text-theme-text-secondary p-0 text-center font-sans !text-sm;
+  }
+
+  /* Clear button */
+  #search .pagefind-ui__search-clear {
+    @apply text-theme-text-secondary cursor-pointer border-none bg-transparent px-1 py-1 pr-4 font-sans;
+  }
+
+  /* Results count */
+  #search .pagefind-ui__results-count {
+    @apply text-theme-text-secondary mb-4 font-sans text-sm;
+  }
+
+  /* Hide images */
+  #search .pagefind-ui__result-thumb {
+    @apply hidden;
+  }
+
+  /* Hide the writings component's own heading since we have our own */
+  .writings-section #writings h2 {
+    @apply hidden;
+  }
+</style>
+
+<script is:inline>
+  // Wait for both DOM and pagefind to be ready
+  function initializeSearchPage() {
+    const params = new URLSearchParams(window.location.search);
+    const clientQuery = params.get('q') || '';
+
+    // Wait for pagefind search input to be available
+    function waitForSearchInput(callback) {
+      const searchInput = document.querySelector(
+        '#search .pagefind-ui__search-input',
+      );
+
+      if (searchInput) {
+        callback(searchInput);
+      } else {
+        // Retry after a short delay
+        setTimeout(() => waitForSearchInput(callback), 100);
+      }
+    }
+
+    waitForSearchInput((searchInput) => {
+      const defaultContent = document.getElementById('default-content');
+
+      // Desktop tag filtering functionality for sidebar
+      const desktopTagFilters = document.querySelectorAll('aside .tag-filter');
+
+      // Function to get URL parameter
+      function getUrlParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+
+      // Function to apply desktop tag filter styling
+      function applyDesktopTagFilter(selectedTag) {
+        const tag = selectedTag || 'all';
+
+        // Update active states for desktop filters only
+        desktopTagFilters.forEach((f) => {
+          // Reset desktop styles
+          f.classList.remove('text-theme-text', 'font-bold');
+          f.classList.add('text-theme-text-secondary');
+        });
+
+        // Find and activate the correct desktop filter
+        const activeDesktopFilters = Array.from(desktopTagFilters).filter(
+          (f) => f.dataset.tag === tag,
+        );
+        activeDesktopFilters.forEach((activeFilter) => {
+          activeFilter.classList.remove('text-theme-text-secondary');
+          activeFilter.classList.add('text-theme-text', 'font-bold');
+        });
+      }
+
+
+      // Function to toggle content based on search state
+      function toggleContentBasedOnSearch() {
+        const hasQuery = searchInput && searchInput.value.trim() !== '';
+
+        if (defaultContent) {
+          if (hasQuery) {
+            defaultContent.classList.add('hidden');
+          } else {
+            defaultContent.classList.remove('hidden');
+          }
+        }
+      }
+
+      // Set initial value from URL if present
+      if (clientQuery) {
+        searchInput.value = clientQuery;
+        // Trigger search
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      // Initial content toggle based on query
+      toggleContentBasedOnSearch();
+
+      // Update URL when typing (debounced) and toggle content
+      let timeout;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          const url = new URL(window.location.href);
+          if (searchInput.value) {
+            url.searchParams.set('q', searchInput.value);
+          } else {
+            url.searchParams.delete('q');
+          }
+          window.history.replaceState({}, '', url);
+          toggleContentBasedOnSearch();
+        }, 300);
+      });
+
+      // Listen for pagefind clear button clicks
+      const searchContainer = document.getElementById('search');
+      if (searchContainer) {
+        searchContainer.addEventListener('click', (e) => {
+          // Check if clicked element is the clear button
+          if (e.target.classList.contains('pagefind-ui__search-clear')) {
+            // Clear the URL parameters
+            setTimeout(() => {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('q');
+              window.history.replaceState({}, '', url);
+              toggleContentBasedOnSearch();
+            }, 50); // Small delay to ensure pagefind has cleared the input
+          }
+        });
+      }
+
+      // Initialize desktop filters based on URL parameter on page load
+      const initialTag = getUrlParam('tag');
+      applyDesktopTagFilter(initialTag);
+
+      // Add click event listeners for desktop tag filters only
+      desktopTagFilters.forEach((filter) => {
+        filter.addEventListener('click', () => {
+          const selectedTag = filter.dataset.tag;
+          if (selectedTag) {
+            // Update URL and let mobile component handle the filtering
+            const url = new URL(window.location.href);
+            if (selectedTag === 'all') {
+              url.searchParams.delete('tag');
+            } else {
+              url.searchParams.set('tag', selectedTag);
+            }
+            window.history.pushState({}, '', url.toString());
+
+            // Trigger mobile component update and sync desktop
+            window.dispatchEvent(new Event('popstate'));
+            applyDesktopTagFilter(selectedTag);
+          }
+        });
+      });
+
+      // Handle browser back/forward navigation
+      window.addEventListener('popstate', () => {
+        const tag = getUrlParam('tag');
+        applyDesktopTagFilter(tag);
+        toggleContentBasedOnSearch();
+      });
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSearchPage);
+  } else {
+    initializeSearchPage();
+  }
+
+  // Also initialize on astro page transitions
+  document.addEventListener('astro:page-load', initializeSearchPage);
+</script>
