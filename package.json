@@ -2,6 +2,7 @@
   "name": "shovanch.com",
   "type": "module",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "submodule-init": "git submodule sync --recursive && git submodule update --init --recursive",
     "dev": "pnpm run submodule-init && node scripts/sync-obsidian-images.js && astro dev",
