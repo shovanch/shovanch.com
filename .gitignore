@@ -133,5 +133,5 @@ dist
 *.Identifier
 .vercel
 .astro
-
+/public/notes/
 

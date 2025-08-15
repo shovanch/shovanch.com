@@ -161,7 +161,7 @@ figure.obsidian-image figcaption {
 }
 
 /* Also apply responsive breakout to regular images in prose for consistency */
-.prose img:not(figure.obsidian-image img) {
+.prose img:not(figure.obsidian-image img):not(.not-prose img) {
   @apply my-8 rounded-lg shadow-lg;
 
   /* Mobile: contained within text column */

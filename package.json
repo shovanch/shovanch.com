@@ -6,11 +6,14 @@
   "scripts": {
     "submodule-init": "git submodule sync --recursive && git submodule update --init --recursive --remote",
     "dev": "pnpm run submodule-init && node scripts/sync-obsidian-images.js && astro dev",
+    "dev:watch": "pnpm run submodule-init && node scripts/watch-obsidian-images.js & astro dev",
     "build": "bash scripts/vercel-build.sh",
     "preview": "astro preview",
     "astro": "astro",
     "prod": "pnpm run build && pnpm run preview",
     "sync-obsidian": "node scripts/sync-obsidian-images.js",
+    "clear-cache": "node scripts/clear-image-cache.js",
+    "regenerate-images": "node scripts/regenerate-image-cache.js",
     "analyze": "astro build --analyze",
     "analyze:bundle": "node scripts/bundle-analyzer.js",
     "build:analyze": "pnpm run build && pnpm run analyze:bundle",
@@ -34,6 +37,7 @@
     "astro": "^5.13.0",
     "astro-expressive-code": "^0.41.3",
     "astro-pagefind": "^1.8.3",
+    "clsx": "^2.1.1",
     "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
     "hast-util-find-and-replace": "^5.0.1",
@@ -41,6 +45,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "rehype-autolink-headings": "^7.1.0",
+    "sharp": "^0.34.3",
     "shiki": "^3.9.2",
     "tailwindcss": "^4.1.11",
     "unified": "^11.0.5",
@@ -48,7 +53,6 @@
     "yet-another-react-lightbox": "^3.25.0"
   },
   "devDependencies": {
-    "sharp": "^0.34.3",
     "@astrojs/check": "^0.9.4",
     "@tailwindcss/typography": "^0.5.16",
     "@types/hast": "^3.0.4",

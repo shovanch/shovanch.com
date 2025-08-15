@@ -32,10 +32,10 @@ async function getFileStats(filePath) {
 async function findAssetDirectories(dir, assetDirs = []) {
   try {
     const entries = await readdir(dir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = join(dir, entry.name);
-      
+
       if (entry.isDirectory()) {
         if (entry.name === 'assets') {
           assetDirs.push(fullPath);
@@ -48,8 +48,34 @@ async function findAssetDirectories(dir, assetDirs = []) {
   } catch (error) {
     // Ignore errors (like permission denied)
   }
-  
+
   return assetDirs;
+}
+
+async function findImagesRecursively(dir, imageExtensions, imageFiles = []) {
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        // Recursively search in subdirectories
+        await findImagesRecursively(fullPath, imageExtensions, imageFiles);
+      } else if (entry.isFile()) {
+        // Check if it's an image file
+        if (
+          imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))
+        ) {
+          imageFiles.push(fullPath);
+        }
+      }
+    }
+  } catch (error) {
+    // Ignore errors (like permission denied)
+  }
+
+  return imageFiles;
 }
 
 async function syncObsidianImages() {
@@ -68,7 +94,7 @@ async function syncObsidianImages() {
 
     // Find all assets directories recursively
     const assetDirectories = await findAssetDirectories(OBSIDIAN_NOTES_DIR);
-    
+
     if (assetDirectories.length === 0) {
       console.log('📁 No assets directories found, skipping sync.');
       return;
@@ -89,36 +115,40 @@ async function syncObsidianImages() {
     let syncedCount = 0;
     let skippedCount = 0;
 
-    // Process each assets directory
+    // Process each assets directory recursively
     for (const assetDir of assetDirectories) {
       console.log(`📂 Processing: ${assetDir}`);
-      
+
       try {
-        const files = await readdir(assetDir);
-        const imageFiles = files.filter((file) =>
-          imageExtensions.some((ext) => file.toLowerCase().endsWith(ext)),
+        const imageFiles = await findImagesRecursively(
+          assetDir,
+          imageExtensions,
         );
 
-        for (const file of imageFiles) {
-          const sourcePath = join(assetDir, file);
-          const destPath = join(PUBLIC_ASSETS_DIR, file);
+        for (const sourcePath of imageFiles) {
+          // Preserve directory structure relative to the assets directory
+          const relativePath = sourcePath.replace(assetDir + '/', '');
+          const destPath = join(PUBLIC_ASSETS_DIR, relativePath);
+
+          // Ensure destination directory exists
+          await ensureDirectoryExists(dirname(destPath));
 
           // Check if destination file exists and is newer
           const sourceStats = await getFileStats(sourcePath);
           const destStats = await getFileStats(destPath);
 
           if (destStats && destStats.mtime >= sourceStats.mtime) {
-            console.log(`⏭️  Skipping ${file} (up to date)`);
+            console.log(`⏭️  Skipping ${relativePath} (up to date)`);
             skippedCount++;
             continue;
           }
 
           try {
             await copyFile(sourcePath, destPath);
-            console.log(`✅ Synced: ${file}`);
+            console.log(`✅ Synced: ${relativePath}`);
             syncedCount++;
           } catch (error) {
-            console.error(`❌ Failed to sync ${file}:`, error.message);
+            console.error(`❌ Failed to sync ${relativePath}:`, error.message);
           }
         }
       } catch (error) {

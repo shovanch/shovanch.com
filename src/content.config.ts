@@ -94,6 +94,7 @@ const notes = defineCollection({
         .union([z.array(z.string().trim().min(1)), z.null()])
         .optional()
         .transform((val) => val || []),
+      coverImage: z.string().optional(),
     })
     .transform((data) => ({
       ...data,

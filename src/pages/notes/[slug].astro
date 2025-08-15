@@ -9,6 +9,7 @@ import {
   validateContentAccess,
 } from '~/utils/content-operations';
 import NoteLayout from '~/layouts/note-layout.astro';
+import { BookCover } from '~/components/book-cover';
 
 export const getStaticPaths = (async () => {
   const notes = await getCollection('notes');
@@ -69,6 +70,29 @@ if (
 } else {
   publishedAt = new Date().toISOString().split('T')[0];
 }
+
+// Convert coverImage path to web-accessible format
+const getCoverImageSrc = (coverImage: string) => {
+  // Handle wikilink format: [[IMG-20250815093239222](assets/path/to/image.webp)]
+  const wikilinkMatch = coverImage.match(/\[([^\]]+)\]\(([^)]+)\)/);
+  if (wikilinkMatch) {
+    const imagePath = wikilinkMatch[2];
+    return `/notes/${imagePath}`;
+  }
+
+  // Handle direct path format: assets/path/to/image.webp
+  if (coverImage.startsWith('assets/')) {
+    return `/notes/${coverImage}`;
+  }
+
+  // Handle absolute path format: /notes/assets/path/to/image.webp
+  if (coverImage.startsWith('/notes/assets/')) {
+    return coverImage;
+  }
+
+  // Default: assume it's relative to notes assets
+  return `/notes/assets/${coverImage}`;
+};
 ---
 
 <NoteLayout
@@ -81,5 +105,14 @@ if (
   headings={tocHeadings}
   readingTime={readingTime}
 >
+  {
+    note.data.type?.includes('book') && note.data.coverImage && (
+      <BookCover
+        src={getCoverImageSrc(note.data.coverImage)}
+        alt={note.data.title || extractTitleFromId(note.id)}
+        size="large"
+      />
+    )
+  }
   <Content />
 </NoteLayout>
