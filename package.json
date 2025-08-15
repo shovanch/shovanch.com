@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "packageManager": "pnpm@10.14.0",
   "scripts": {
-    "submodule-init": "git submodule sync --recursive && git submodule update --init --recursive",
+    "submodule-init": "git submodule sync --recursive && git submodule update --init --recursive --remote",
     "dev": "pnpm run submodule-init && node scripts/sync-obsidian-images.js && astro dev",
     "build": "bash scripts/vercel-build.sh",
     "preview": "astro preview",

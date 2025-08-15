@@ -7,11 +7,9 @@ import { getEntry, render } from 'astro:content';
 import { UI_CONSTANTS } from '~/constants/ui-constants';
 
 // Load the about content from notes collection
-let aboutEntry =
-  (await getEntry('notes', 'about/About')) ||
-  (await getEntry('notes', 'about/about')) ||
-  (await getEntry('notes', 'About')) ||
-  (await getEntry('notes', 'about'));
+// Load the about content from notes collection
+let aboutEntry = await getEntry('notes', 'texts/about/about');
+
 if (!aboutEntry) {
   throw new Error('About page content not found');
 }

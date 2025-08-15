@@ -8,6 +8,16 @@ import Writings from '~/components/writings.astro';
 import HeaderBackground from '~/components/header-background.astro';
 import SocialLinks from '~/components/social-links.astro';
 import { UI_CONSTANTS } from '~/constants/ui-constants';
+
+import { getCollection } from 'astro:content';
+import { render } from 'astro:content';
+
+// Fetch hero content from Obsidian notes
+const notes = await getCollection('notes');
+const heroNote = notes.find((note) => note.id === 'texts/hero');
+const { Content: HeroContent } = heroNote
+  ? await render(heroNote)
+  : { Content: null };
 ---
 
 <!doctype html>
@@ -48,26 +58,11 @@ import { UI_CONSTANTS } from '~/constants/ui-constants';
         class:list={[
           UI_CONSTANTS.PROSE.default,
           'prose-p:my-1 prose-p:md:my-1.5 max-w-none text-pretty',
+          'prose-a:not-prose prose-a:hover:decoration-theme-text prose-a:!pl-0 prose-a:text-lg prose-a:font-medium prose-a:italic prose-a:underline',
+          'prose-a:decoration prose-a:mr-1 prose-a:inline-block prose-a:underline prose-a:decoration-dashed prose-a:underline-offset-4',
         ]}
       >
-        <p>Hi, I’m Shovan!</p>
-        <p>
-          I’m a <strong>software engineer</strong> focused on building for the web.
-        </p>
-        <p>
-          I work with <strong>full-stack TypeScript</strong> using React, Next.js,
-          Node.js, and TanStack.
-        </p>
-        <a
-          href="/about"
-          class="not-prose hover:decoration-theme-text !pl-0 text-lg font-medium italic"
-          aria-label="More about me"
-        >
-          <span
-            class="decoration mr-1 inline-block underline decoration-dashed underline-offset-4"
-            >More about me
-          </span> →
-        </a>
+        {HeroContent && <HeroContent />}
       </div>
 
       <SocialLinks />

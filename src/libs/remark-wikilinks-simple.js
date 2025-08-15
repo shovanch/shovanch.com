@@ -74,7 +74,6 @@ function buildSlugMappingSync() {
           const title = data.title || extractTitleFromId(relativeFilePath);
           const filename = extractTitleFromId(relativeFilePath);
 
-
           // Map both title and filename to the actual slug
           slugMapping.set(title, actualSlug);
           slugMapping.set(filename, actualSlug);
@@ -82,7 +81,6 @@ function buildSlugMappingSync() {
           // Also map the generated slug (for backwards compatibility)
           const generatedSlug = generateSlugFromId(relativeFilePath);
           slugMapping.set(generatedSlug, actualSlug);
-
         } catch (error) {
           console.warn(`Error processing ${fullPath}:`, error.message);
         }
@@ -134,10 +132,17 @@ export function remarkWikilinksSimple() {
 
     // Handle regular markdown links ending with .md
     visit(tree, 'link', (node) => {
+      // Skip absolute paths that don't end with .md (these are intentional web routes)
+      if (node.url && node.url.startsWith('/') && !node.url.endsWith('.md')) {
+        return;
+      }
+
       if (node.url && node.url.endsWith('.md')) {
         const fullPath = decodeURIComponent(node.url).replace(/\.md$/, '');
         // Handle relative paths like "../notes/Principles I Believe In" by extracting just the filename
-        const noteName = fullPath.includes('/') ? fullPath.split('/').pop() : fullPath;
+        const noteName = fullPath.includes('/')
+          ? fullPath.split('/').pop()
+          : fullPath;
         const slug = getSlugForNote(noteName, slugMappingCache);
         node.url = `/notes/${slug}`;
       }

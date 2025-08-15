@@ -25,12 +25,12 @@ export async function getObsidianNotes(): Promise<ObsidianNote[]> {
       const isSystemFile =
         note.id.startsWith('.') ||
         note.id.includes('/.') ||
-        note.id.startsWith('Excalidraw/') ||
         note.id.includes('excalidraw/') ||
-        note.id.startsWith('note-template/') ||
+        note.id.startsWith('templates/') ||
+        note.id.startsWith('texts/') ||
         note.id.includes('.excalidraw') ||
         note.id.includes('Untitled') ||
-        note.id.includes('Drawing '); // Excalidraw drawings
+        note.id.includes('drawing '); // Excalidraw drawings
 
       if (isSystemFile) return false;
 
