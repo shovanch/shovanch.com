@@ -1,6 +1,7 @@
 ---
 import { siteConfig } from '~/config/site';
 import SocialLinks from '~/components/social-links.astro';
+import Signature from './signature.astro';
 
 const currentYear = new Date().getFullYear();
 ---
@@ -9,15 +10,19 @@ const currentYear = new Date().getFullYear();
   <div
     class="mx-auto flex max-w-3xl flex-col items-center justify-center space-y-2 px-4 py-4 pb-8 text-center md:flex-row md:justify-between md:space-y-0"
   >
-    <div class="text-theme-text-secondary text-lg font-medium">
-      © {currentYear}
-      <a
-        class="cursor-pointer italic underline decoration-dashed underline-offset-4"
-        href="https://github.com/shovanch/shovanch.com"
-        target="_blank">crafted</a
-      > by <span class="text-theme-chip-post font-semibold italic"
-        >{siteConfig.author}</span
-      >, with love 🥰
+    <div>
+      <div
+        class="text-theme-text-secondary flex items-center gap-1 text-lg font-medium"
+      >
+        <a
+          class="cursor-pointer italic underline decoration-dashed underline-offset-4"
+          href="https://github.com/shovanch/shovanch.com"
+          target="_blank">crafted</a
+        > by
+        <div class="inline">
+          <Signature className="w-40 md:w-52" />
+        </div>
+      </div>
     </div>
 
     <SocialLinks location="footer" />

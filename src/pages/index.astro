@@ -5,12 +5,13 @@ import RootLayout from '~/layouts/root-layout.astro';
 import Navigation from '~/components/nav.astro';
 import { Image } from 'astro:assets';
 import Writings from '~/components/writings.astro';
-import HeaderBackground from '~/components/header-background.astro';
+import HeroBackground from '~/components/hero-background.astro';
 import SocialLinks from '~/components/social-links.astro';
 import { UI_CONSTANTS } from '~/constants/ui-constants';
 
 import { getCollection } from 'astro:content';
 import { render } from 'astro:content';
+import Signature from '~/components/signature.astro';
 
 // Fetch hero content from Obsidian notes
 const notes = await getCollection('notes');
@@ -26,7 +27,7 @@ const { Content: HeroContent } = heroNote
     <BaseHead title={defaultMeta.title} description={defaultMeta.description} />
   </head>
   <div class="absolute top-0 left-0 z-0 w-screen overflow-hidden text-red-400">
-    <HeaderBackground />
+    <HeroBackground />
   </div>
 
   <RootLayout>
@@ -42,11 +43,11 @@ const { Content: HeroContent } = heroNote
         height="96"
       />
       <div class="flex flex-col">
-        <h2 class="font-serif text-2xl font-semibold md:text-[1.75rem]">
-          Shovan Chatterjee
-        </h2>
-        <div class="flex flex-row items-center gap-2.5 md:-mt-1">
-          <p class="font-sans font-medium opacity-75 md:text-lg">
+        <div class="w-max">
+          <Signature className="w-64 md:w-80" />
+        </div>
+        <div class="-mt-1.5 flex flex-row items-center gap-2.5 md:-mt-2">
+          <p class="font-sans text-sm font-medium opacity-75 md:text-lg">
             Engineer, Tinkerer, Explorer
           </p>
         </div>
