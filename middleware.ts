@@ -1,26 +1,18 @@
-// middleware.ts (project root)
 import { NextRequest, NextResponse } from 'next/server';
 
-const umamiScriptUrl = 'https://cloud.umami.is/script.js';
+const UMAMI_HOST = 'https://cloud.umami.is';
 
 export const config = {
-  // only intercept umami proxy namespace
+  // Intercept only proxy namespace
   matcher: ['/umami/:path*'],
 };
 
 export default function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  if (pathname === '/umami/script.js') {
-    // proxy tracker script
-    return NextResponse.rewrite(`${umamiScriptUrl}${search}`);
-  }
+  // Map /umami/*  ->  <UMAMI_HOST>/*
+  const upstreamPath = pathname.replace('/umami', '');
+  const upstreamUrl = `${UMAMI_HOST}${upstreamPath}${search}`;
 
-  if (pathname.startsWith('/umami/api/send')) {
-    // proxy event ingestion
-    const dest = `${umamiScriptUrl}${pathname.replace('/umami', '')}${search}`;
-    return NextResponse.rewrite(dest);
-  }
-
-  return NextResponse.next();
+  return NextResponse.rewrite(upstreamUrl);
 }
