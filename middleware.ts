@@ -5,6 +5,7 @@ const UMAMI_HOST = 'https://cloud.umami.is';
 export const config = {
   // Intercept only proxy namespace
   matcher: ['/umami/:path*'],
+  runtime: 'nodejs', // https://vercel.com/changelog/middleware-now-supports-node-js
 };
 
 export default function middleware(req: NextRequest) {
