@@ -15,6 +15,7 @@ export type BaseLayoutProps = {
   renderOnClientRouter?: boolean;
   articleClass?: string;
   proseClass?: string;
+  updatedAt?: string;
 };
 
 type Props = BaseLayoutProps;
@@ -23,6 +24,7 @@ const {
   title,
   summary,
   publishedAt,
+  updatedAt,
   slug,
   tags,
   readingTime,
@@ -119,6 +121,14 @@ const defaultProseClass = UI_CONSTANTS.PROSE.default;
                   </a>
                 ))}
               </div>
+            )
+          }
+
+          {
+            updatedAt && (
+              <p class="text-theme-text-secondary mt-2 text-sm">
+                Last updated: {formatDate(updatedAt)}
+              </p>
             )
           }
         </header>

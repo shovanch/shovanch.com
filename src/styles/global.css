@@ -144,11 +144,11 @@ body {
 
 /* Scrollbar */
 * {
-  scrollbar-color: var(--color-zinc-300) var(--color-zinc-800);
+  scrollbar-color: var(--color-zinc-800) transparent;
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 8px;
 }
 ::-webkit-scrollbar:horizontal {
   height: 4px;

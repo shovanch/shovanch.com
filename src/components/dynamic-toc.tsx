@@ -362,7 +362,7 @@ export function DynamicTOC({ headings, readingTime }: DynamicTOCProps) {
         aria-label="Table of contents"
         role="navigation"
       >
-        <div className="max-h-[70vh] w-full overflow-x-hidden overflow-y-auto p-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-sm [&::-webkit-scrollbar-thumb]:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb:hover]:bg-gray-500 dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500 [&::-webkit-scrollbar-track]:bg-transparent">
+        <div className="max-h-[70vh] w-full overflow-x-hidden overflow-y-auto p-4">
           <div className="mb-3 -ml-1.5 flex items-center gap-2">
             {/* Simple circular progress indicator */}
             <div className="relative h-4 w-4">
