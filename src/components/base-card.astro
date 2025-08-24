@@ -79,11 +79,7 @@ const ariaLabel = `Read ${contentType}: ${title}`;
           </span>
           {tags.map((tag, index) => (
             <a
-              href={
-                contentType === 'post'
-                  ? `/posts?tag=${tag}`
-                  : `/notes?tag=${tag}`
-              }
+              href={`/search?tag=${tag}`}
               class={`tag-link pl-0 ${index > 0 ? '!hidden md:!inline' : ''}`}
             >
               #{tag}

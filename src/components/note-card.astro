@@ -24,7 +24,7 @@ const { post } = Astro.props;
         post.data.tags && post.data.tags.length > 0 && (
           <div class="-mt-3.5 flex flex-wrap gap-2 md:-mt-4">
             {post.data.tags.map((tag) => (
-              <a class="tag-link !pl-0 text-base" href={`/notes?tag=${tag}`}>
+              <a class="tag-link !pl-0 text-base" href={`/search?tag=${tag}`}>
                 #{tag}
               </a>
             ))}
