@@ -1,9 +1,17 @@
 import type { APIRoute } from 'astro';
+import { isDevEnv } from '~/utils/is-dev-env.js';
 import { UMAMI_HOST } from '../script.js';
 
 export const prerender = false;
 
 export const ALL: APIRoute = async ({ request }) => {
+  if (isDevEnv) {
+    return new Response('Umami API is disabled in development mode', {
+      status: 200,
+    });
+  }
+
+  // Forward the request to Umami's /api/send endpoint
   const upstreamUrl = `${UMAMI_HOST}/api/send`;
 
   const res = await fetch(upstreamUrl, {
