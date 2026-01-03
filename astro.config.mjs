@@ -18,8 +18,8 @@ export default defineConfig({
   site: 'https://shovanch.com',
   build: {
     format: 'directory',
-    // Inline styles for better performance
-    inlineStylesheets: 'auto',
+    // Inline all styles to eliminate render-blocking CSS
+    inlineStylesheets: 'always',
   },
   prefetch: {
     prefetchAll: true,
