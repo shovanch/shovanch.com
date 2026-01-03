@@ -40,6 +40,13 @@ const canonicalURL = canonical
   type="font/woff2"
   crossorigin
 />
+<link
+  rel="preload"
+  href="/fonts/source-serif-4-latin-600-normal.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
 
 <!-- Optional font preloads - load with lower priority -->
 <link
@@ -159,6 +166,18 @@ const canonicalURL = canonical
   title={`${title} RSS Feed`}
   href={new URL('rss.xml', Astro.site)}
 />
+
+<!-- Speculation Rules API for instant page navigation (Chrome/Edge) -->
+<script type="speculationrules">
+{
+  "prerender": [
+    {
+      "where": { "href_matches": "/*" },
+      "eagerness": "moderate"
+    }
+  ]
+}
+</script>
 
 <script
   defer

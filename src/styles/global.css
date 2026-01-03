@@ -305,6 +305,12 @@ select:focus:not(:focus-visible) {
   }
 } */
 
+/* Speed up view transition for near-instant navigation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 50ms;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,
