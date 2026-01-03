@@ -1,11 +1,10 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import Footer from '~/components/footer.astro';
 ---
 
 <script is:inline>
   // eslint-disable-next-line ts/explicit-function-return-type
-  function setThemeMode(document) {
+  function setThemeMode() {
     const prefersDark =
       window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -33,26 +32,8 @@ import Footer from '~/components/footer.astro';
     // Light theme is default (no class needed)
   }
 
-  setThemeMode(document);
-
-  document.addEventListener('astro:before-swap', (ev) => {
-    setThemeMode(ev.newDocument);
-  });
+  setThemeMode();
 </script>
-
-<!-- Remove font preload when swapping pages: REF: https://github.com/withastro/astro/issues/10425 -->
-<script>
-  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
-  document.addEventListener('astro:before-swap', (e) =>
-    [
-      ...(e as TransitionBeforeSwapEvent).newDocument.head.querySelectorAll(
-        'link[as="font"]',
-      ),
-    ].forEach((link) => link.remove()),
-  );
-</script>
-
-<ClientRouter />
 <div
   id="root-container"
   class="relative flex min-h-screen flex-col overflow-x-hidden antialiased"
