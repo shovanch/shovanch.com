@@ -166,22 +166,6 @@ body {
   background: var(--color-zinc-800);
 }
 
-/* Styles for nprogress */
-#nprogress {
-  pointer-events: none;
-}
-
-#nprogress .bar {
-  background: #888;
-  opacity: 0.75;
-  position: fixed;
-  z-index: 1031;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-}
-
 .post-year-title {
   color: #333;
   -webkit-text-fill-color: white; /* Will override color (regardless of order) */
@@ -308,7 +292,7 @@ select:focus:not(:focus-visible) {
 /* Speed up view transition for near-instant navigation */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 50ms;
+  animation-duration: 200ms;
 }
 
 /* Reduced motion support */
