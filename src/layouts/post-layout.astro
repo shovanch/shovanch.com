@@ -39,7 +39,7 @@ const {
   <Fragment slot="toc">
     {
       showToc && headings && headings.length > 0 && (
-        <DynamicTOC headings={headings} readingTime={readingTime} client:load />
+        <DynamicTOC headings={headings} readingTime={readingTime} client:idle />
       )
     }
   </Fragment>
