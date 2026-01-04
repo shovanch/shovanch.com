@@ -13,6 +13,7 @@ import MobileTagsFilter from '~/components/mobile-tags-filter.astro';
 export const prerender = false;
 
 const query = Astro.url.searchParams.get('q') ?? undefined;
+const tag = Astro.url.searchParams.get('tag') ?? undefined;
 
 // Fetch posts from content collection
 const posts = (await getCollection('posts')).filter((post) => {
@@ -93,14 +94,14 @@ const totalWritings = posts.length + notes.length;
         <div class="relative">
           <!-- Writings Section -->
           <div class="w-full">
-            <div
+<div
               class="writings-section prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2"
             >
               <h2
                 id="writings-title"
-                class="text-theme-text font-sans text-lg md:text-2xl"
+                class:list={["text-theme-text font-sans text-lg md:text-2xl", { hidden: !tag }]}
               >
-                Writings
+                {tag ? `Result for ${tag}` : ''}
               </h2>
               <Writings showNotes />
             </div>
@@ -295,6 +296,7 @@ const totalWritings = posts.length + notes.length;
 
     waitForSearchInput((searchInput) => {
       const defaultContent = document.getElementById('default-content');
+      const writingsTitle = document.getElementById('writings-title');
 
       // Desktop tag filtering functionality for sidebar
       const desktopTagFilters = document.querySelectorAll('aside .tag-filter');
@@ -305,7 +307,7 @@ const totalWritings = posts.length + notes.length;
         return urlParams.get(param);
       }
 
-      // Function to apply desktop tag filter styling
+      // Function to apply desktop tag filter styling and show/hide writings
       function applyDesktopTagFilter(selectedTag) {
         const tag = selectedTag || 'all';
 
@@ -324,6 +326,17 @@ const totalWritings = posts.length + notes.length;
           activeFilter.classList.remove('text-theme-text-secondary');
           activeFilter.classList.add('text-theme-text', 'font-bold');
         });
+
+        // Show/hide writings title based on tag selection
+        if (writingsTitle) {
+          if (selectedTag && selectedTag !== 'all') {
+            writingsTitle.classList.remove('hidden');
+            writingsTitle.textContent = `Result for ${selectedTag}`;
+          } else {
+            writingsTitle.classList.add('hidden');
+            writingsTitle.textContent = '';
+          }
+        }
       }
 
       // Function to toggle content based on search state
