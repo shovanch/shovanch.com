@@ -52,7 +52,7 @@ export const navigationConfig = {
     { label: 'email', url: `mailto:${siteConfig.email}` },
     { label: 'github', url: 'https://github.com/shovanch' },
     { label: 'linkedin', url: 'https://www.linkedin.com/in/shovanch' },
-    { label: 'twitter', url: 'https://x.com/shovan_ch' },
+    { label: 'twitter', url: 'https://x.com/shovanch_' },
     { label: 'rss', url: `${siteConfig.url}/rss.xml` },
   ],
 } as const;

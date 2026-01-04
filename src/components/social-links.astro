@@ -1,7 +1,7 @@
 ---
 import { socialLinks } from '~/config/site';
 import EmailIcon from '~/components/email-icon.astro';
-import TwitterIcon from '~/components/twitter-icon.astro';
+import XIcon from '~/components/x-icon.astro';
 import GitHubIcon from '~/components/github-icon.astro';
 import RSSIcon from '~/components/rss-icon.astro';
 import LinkedInIcon from '~/components/linkedin-icon.astro';
@@ -17,7 +17,7 @@ const getIconComponent = (label: string) => {
     case 'email':
       return EmailIcon;
     case 'twitter':
-      return TwitterIcon;
+      return XIcon;
     case 'github':
       return GitHubIcon;
     case 'rss':
@@ -169,7 +169,7 @@ socialLinks.forEach((link, index) => {
           displayName = 'LinkedIn';
           break;
         case 'twitter':
-          displayName = 'Twitter';
+          displayName = 'X (Twitter)';
           break;
         case 'rss':
           displayName = 'RSS';
@@ -184,7 +184,7 @@ socialLinks.forEach((link, index) => {
       return IconComponent ? (
         isEmail ? (
           <button
-            class={`social-icon-link social-icon-${link.label} hover:!text-theme-link-hover text-theme-link/95 inline-flex cursor-pointer items-center justify-center border-none !bg-transparent !p-0 hover:!bg-transparent`}
+            class={`social-icon-link social-icon-${link.label} hover:text-theme-link-hover! text-theme-link/95 inline-flex cursor-pointer items-center justify-center border-none bg-transparent! p-0! hover:bg-transparent!`}
             style={`transform: rotate(${iconRotations[link.label] || 0}deg)`}
             onclick={`copyEmail('${link.url.replace('mailto:', '')}', this)`}
             aria-label="Copy email address"
@@ -195,7 +195,7 @@ socialLinks.forEach((link, index) => {
         ) : (
           <a
             href={link.url}
-            class={`social-icon-link social-icon-${link.label} !text-theme-link/95 hover:!text-theme-link-hover inline-flex items-center justify-center !bg-transparent !p-0 hover:!bg-transparent`}
+            class={`social-icon-link social-icon-${link.label} text-theme-link! hover:text-theme-link-hover! inline-flex items-center justify-center bg-transparent! p-0! hover:bg-transparent!`}
             style={`transform: rotate(${iconRotations[link.label] || 0}deg)`}
             target="_blank"
             title={displayName}

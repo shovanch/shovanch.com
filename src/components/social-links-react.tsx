@@ -12,13 +12,14 @@ const EmailIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const TwitterIcon = ({ className }: { className?: string }) => (
+const XIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 640 640"
+    viewBox="0 0 448 512"
     className={className}
+    style={{ transform: 'scale(0.85)' }}
   >
-    <path d="M160 96C124.7 96 96 124.7 96 160L96 480C96 515.3 124.7 544 160 544L480 544C515.3 544 544 515.3 544 480L544 160C544 124.7 515.3 96 480 96L160 96zM447.3 263.3C447.3 350 381.3 449.9 260.7 449.9C223.5 449.9 189 439.1 160 420.5C165.3 421.1 170.4 421.3 175.8 421.3C206.5 421.3 234.7 410.9 257.2 393.3C228.4 392.7 204.2 373.8 195.9 347.8C206 349.3 215.1 349.3 225.5 346.6C195.5 340.5 173 314.1 173 282.2L173 281.4C181.7 286.3 191.9 289.3 202.6 289.7C193.6 283.7 186.2 275.6 181.1 266.1C176 256.6 173.3 245.9 173.4 235.1C173.4 222.9 176.6 211.7 182.3 202C214.6 241.8 263.1 267.8 317.5 270.6C308.2 226.1 341.5 190 381.5 190C400.4 190 417.4 197.9 429.4 210.7C444.2 207.9 458.4 202.4 471 194.9C466.1 210.1 455.8 222.9 442.2 231C455.4 229.6 468.2 225.9 480 220.8C471.1 233.9 459.9 245.5 447.1 254.8C447.3 257.6 447.3 260.5 447.3 263.3z" />
+    <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm297.1 84l-103.8 118.6 122.1 161.4-95.6 0-74.8-97.9-85.7 97.9-47.5 0 111-126.9-117.1-153.1 98 0 67.7 89.5 78.2-89.5 47.5 0zM323.3 367.6l-169.9-224.7-28.3 0 171.8 224.7 26.4 0z" />
   </svg>
 );
 
@@ -57,7 +58,7 @@ const getIconComponent = (label: string) => {
     case 'email':
       return EmailIcon;
     case 'twitter':
-      return TwitterIcon;
+      return XIcon;
     case 'github':
       return GitHubIcon;
     case 'rss':
@@ -76,7 +77,7 @@ const getDisplayName = (label: string) => {
     case 'linkedin':
       return 'LinkedIn';
     case 'twitter':
-      return 'Twitter';
+      return 'X (Twitter)';
     case 'rss':
       return 'RSS';
     case 'email':
@@ -162,7 +163,7 @@ export function SocialLinksReact() {
             <button
               key={link.url}
               onClick={() => copyEmail(link.url)}
-              className={`text-theme-link hover:!text-theme-link-hover relative inline-flex cursor-pointer items-center justify-center border-none !bg-transparent !p-0 opacity-100 transition-all duration-200 ease-in-out hover:scale-110 hover:rotate-0 hover:!bg-transparent dark:text-white ${rotationClass}`}
+              className={`text-theme-link hover:text-theme-link-hover! relative inline-flex cursor-pointer items-center justify-center border-none bg-transparent! p-0! opacity-100 transition-all duration-200 ease-in-out hover:scale-110 hover:rotate-0 hover:bg-transparent! dark:text-white ${rotationClass}`}
               aria-label="Copy email address"
               onMouseEnter={() =>
                 setTooltip({ show: true, text: displayName, success: false })
@@ -198,7 +199,7 @@ export function SocialLinksReact() {
           <a
             key={link.url}
             href={link.url}
-            className={`text-theme-link/95 hover:!text-theme-link-hover relative inline-flex items-center justify-center !bg-transparent !p-0 opacity-100 transition-all duration-200 ease-in-out hover:scale-110 hover:rotate-0 hover:!bg-transparent ${rotationClass}`}
+            className={`text-theme-link/95 hover:text-theme-link-hover! relative inline-flex items-center justify-center bg-transparent! p-0! opacity-100 transition-all duration-200 ease-in-out hover:scale-110 hover:rotate-0 hover:bg-transparent! ${rotationClass}`}
             target="_blank"
             rel="noopener noreferrer"
             onMouseEnter={() =>
@@ -210,7 +211,7 @@ export function SocialLinksReact() {
           >
             <IconComponent className="h-8 w-8 fill-current md:h-10 md:w-10" />
             {tooltip.show && (
-              <span className="bg-theme-text text-theme-bg pointer-events-none absolute bottom-full left-1/2 z-[1000] mb-2 -translate-x-1/2 rounded px-2 py-1 font-sans text-xs whitespace-nowrap transition-all duration-200 ease-in-out">
+              <span className="bg-theme-text text-theme-bg pointer-events-none absolute bottom-full left-1/2 z-1000 mb-2 -translate-x-1/2 rounded px-2 py-1 font-sans text-xs whitespace-nowrap transition-all duration-200 ease-in-out">
                 {tooltip.text}
                 <div className="border-t-theme-text absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent" />
               </span>
