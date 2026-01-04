@@ -42,11 +42,6 @@ class MobileMenu {
       backdrop.addEventListener('click', () => this.closeMenu());
     }
 
-    // Close menu on menu link click
-    this.menuLinks?.forEach((link) => {
-      link.addEventListener('click', () => this.closeMenu());
-    });
-
     // Close menu on ESC key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isOpen) {
