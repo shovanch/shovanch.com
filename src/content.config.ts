@@ -62,6 +62,18 @@ const posts = defineCollection({
     }, 'Updated date must be after published date'),
 });
 
+const fragments = defineCollection({
+  loader: glob({
+    pattern: ['**/*.md', '!**/_templates/**'],
+    base: './src/content/vault/fragments',
+  }),
+  schema: z.object({
+    publishedAt: dateSchema.optional(),
+    updatedAt: dateSchema.optional(),
+    isPublished: z.boolean().optional().default(true),
+  }),
+});
+
 const notes = defineCollection({
   loader: glob({
     pattern: [
@@ -70,9 +82,11 @@ const notes = defineCollection({
       '!**/excalidraw/**',
       '!**/*.excalidraw.*',
       '!**/templates/**',
+      '!**/_templates/**',
+      '!**/fragments/**',
       '!**/db/**',
     ],
-    base: './src/content/notes',
+    base: './src/content/vault',
   }),
   schema: z
     .object({
@@ -80,7 +94,7 @@ const notes = defineCollection({
       publishedAt: dateSchema.optional(),
       updatedAt: dateSchema.optional(),
       slug: z.string().optional(),
-      isPublished: z.boolean().optional().default(true),
+      isPublished: z.boolean().optional().default(false),
       published: z.boolean().optional(), // Alternative field name used in some notes
       tags: z
         .union([z.array(z.string().trim().min(1)), z.null()])
@@ -99,7 +113,7 @@ const notes = defineCollection({
     .transform((data) => ({
       ...data,
       // Use 'published' as fallback for isPublished if available
-      isPublished: data.isPublished ?? data.published ?? true,
+      isPublished: data.isPublished ?? data.published ?? false,
     }))
     .refine((data) => {
       // Ensure updatedAt is after publishedAt if both exist
@@ -110,12 +124,14 @@ const notes = defineCollection({
     }, 'Updated date must be after published date'),
 });
 
-export const collections = { posts, notes };
+export const collections = { posts, notes, fragments };
 
 export type Post = CollectionEntry<'posts'>;
 export type Note = CollectionEntry<'notes'>;
+export type Fragment = CollectionEntry<'fragments'>;
 
 // Extended types with additional metadata
 export type PostWithType = Post & { type: 'post' };
 export type NoteWithType = Note & { type: 'note' };
+export type FragmentWithType = Fragment & { type: 'fragment' };
 export type ContentItem = PostWithType | NoteWithType;

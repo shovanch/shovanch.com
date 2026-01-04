@@ -14,7 +14,7 @@ const shouldShowActiveStyle = isActive && !isHome;
 
 <a
   href={href}
-  class={`font-sans text-lg md:text-xl ${shouldShowActiveStyle ? 'active-nav-link' : ''}`}
+  class={`font-sans text-lg md:text-xl ${shouldShowActiveStyle ? 'active-nav-link' : ''}  ${className ?? ''}`}
   aria-current={isActive ? 'page' : undefined}
   {...props}
 >

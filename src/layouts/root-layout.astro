@@ -1,38 +1,25 @@
 ---
-import Footer from '~/components/footer.astro';
 ---
 
 <script is:inline>
   // eslint-disable-next-line ts/explicit-function-return-type
   function setThemeMode() {
-    const prefersDark =
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const storedTheme = localStorage.getItem('theme');
-
-    // Determine theme: stored preference -> system preference -> dark as fallback
-    let theme;
-    if (storedTheme) {
-      theme = storedTheme;
-    } else if (prefersDark) {
-      theme = 'dark';
-    } else {
-      theme = 'light'; // Respect light system preference
-    }
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     // Remove all theme classes
     document.documentElement.classList.remove('dark', 'blue');
 
-    // Apply the appropriate theme
-    if (theme === 'dark') {
+    // Apply dark theme if system prefers dark
+    if (prefersDark) {
       document.documentElement.classList.add('dark');
-    } else if (theme === 'blue') {
-      document.documentElement.classList.add('blue');
     }
     // Light theme is default (no class needed)
   }
 
   setThemeMode();
+
+  // Listen for system preference changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setThemeMode);
 </script>
 <div
   id="root-container"
@@ -45,7 +32,6 @@ import Footer from '~/components/footer.astro';
       <slot />
     </main>
   </div>
-  <Footer />
 </div>
 
 <head>

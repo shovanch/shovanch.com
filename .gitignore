@@ -134,4 +134,5 @@ dist
 .vercel
 .astro
 /public/notes/
+/public/vault/
 

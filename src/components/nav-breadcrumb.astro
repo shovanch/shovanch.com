@@ -1,0 +1,152 @@
+---
+import MobileMenuOverlay from './mobile-menu-overlay.astro';
+
+type Props = {
+  section: 'posts' | 'notes' | 'fragments' | 'about' | 'search';
+};
+
+const { section } = Astro.props;
+const sectionUrl = `/${section}`;
+const sectionLabel = section.charAt(0).toUpperCase() + section.slice(1);
+---
+
+<nav
+  class="relative z-50 flex w-full items-center gap-3"
+  aria-label="Breadcrumb navigation"
+>
+  <!-- Hamburger button -->
+  <button
+    id="breadcrumb-menu-toggle"
+    aria-label="Open menu"
+    aria-expanded="false"
+    class="breadcrumb-hamburger relative z-50 flex h-10 w-10 cursor-pointer flex-col items-center justify-center rounded-full transition-all duration-300 hover:bg-theme-surface/50"
+  >
+    <div class="relative h-4 w-6">
+      <span
+        class="breadcrumb-line breadcrumb-line-1 absolute left-0 h-0.5 w-full rounded-sm bg-theme-text transition-all duration-300 ease-in-out"
+      ></span>
+      <span
+        class="breadcrumb-line breadcrumb-line-2 absolute left-0 h-0.5 w-full rounded-sm bg-theme-text transition-all duration-300 ease-in-out"
+      ></span>
+    </div>
+  </button>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-text flex items-center gap-2 font-sans text-lg font-medium md:text-xl">
+    <a
+      href="/"
+      class="text-theme-text-secondary hover:text-theme-text transition-colors duration-200"
+    >
+      Shovan Chatterjee
+    </a>
+    <span class="text-theme-text-secondary">/</span>
+    <a
+      href={sectionUrl}
+      class="text-theme-text-secondary hover:text-theme-text transition-colors duration-200"
+    >
+      {sectionLabel}
+    </a>
+  </div>
+</nav>
+
+<!-- Full-screen overlay menu -->
+<MobileMenuOverlay />
+
+<script>
+  function initBreadcrumbMenu() {
+    const toggle = document.getElementById('breadcrumb-menu-toggle');
+    const backdrop = document.getElementById('mobile-menu-backdrop');
+    const overlay = document.getElementById('mobile-menu-overlay');
+
+    let scrollY = 0;
+
+    const openMenu = () => {
+      scrollY = window.scrollY;
+
+      document.body.classList.add('mobile-menu-open');
+      toggle?.setAttribute('aria-expanded', 'true');
+
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeMenu = () => {
+      document.body.classList.remove('mobile-menu-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+
+      window.scrollTo(0, scrollY);
+    };
+
+    toggle?.addEventListener('click', () => {
+      if (document.body.classList.contains('mobile-menu-open')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    backdrop?.addEventListener('click', closeMenu);
+
+    overlay?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('mobile-menu-open')) {
+        closeMenu();
+      }
+    });
+  }
+
+  initBreadcrumbMenu();
+
+  document.addEventListener('astro:after-swap', initBreadcrumbMenu);
+</script>
+
+<style>
+  /* Hamburger lines default state */
+  .breadcrumb-line {
+    background-color: var(--theme-text);
+  }
+
+  .breadcrumb-line-1 {
+    top: 2px;
+  }
+
+  .breadcrumb-line-2 {
+    bottom: 2px;
+  }
+
+  /* Hamburger transforms to X when menu is open */
+  :global(.mobile-menu-open) .breadcrumb-hamburger {
+    z-index: 51;
+  }
+
+  :global(.mobile-menu-open) .breadcrumb-line {
+    background-color: var(--theme-text) !important;
+  }
+
+  :global(.mobile-menu-open) .breadcrumb-text {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  :global(.mobile-menu-open) .breadcrumb-line-1 {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  :global(.mobile-menu-open) .breadcrumb-line-2 {
+    bottom: 50%;
+    transform: translateY(50%) rotate(-45deg);
+  }
+</style>

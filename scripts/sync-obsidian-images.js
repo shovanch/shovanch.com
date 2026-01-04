@@ -8,8 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Paths work with both direct files and git submodule structure
-const OBSIDIAN_NOTES_DIR = join(__dirname, '../src/content/notes');
-const PUBLIC_ASSETS_DIR = join(__dirname, '../public/notes/assets');
+const OBSIDIAN_NOTES_DIR = join(__dirname, '../src/content/vault');
+const PUBLIC_ASSETS_DIR = join(__dirname, '../public/vault/assets');
 
 async function ensureDirectoryExists(dir) {
   try {

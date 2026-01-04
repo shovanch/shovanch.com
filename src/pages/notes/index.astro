@@ -1,5 +1,5 @@
 ---
-import Navigation from '~/components/nav.astro';
+import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
 import BaseHead from '~/components/base-head.astro';
 import { defaultMeta } from '~/config/site';
 import RootLayout from '~/layouts/root-layout.astro';
@@ -39,14 +39,11 @@ const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
     />
   </head>
   <RootLayout>
-    <Navigation />
+    <NavBreadcrumb section="notes" />
 
     <main class="flex w-full flex-col gap-6">
       <div class="flex flex-col gap-2">
         <h1 class="text-theme-text font-sans text-4xl font-semibold">Notes</h1>
-        <p class="text-theme-text-secondary text-lg">
-          Quick thoughts and discoveries from my learning journey.
-        </p>
       </div>
 
       <!-- Mobile Tags Filter -->
@@ -88,7 +85,7 @@ const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
                     class="tag-filter text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center justify-end gap-1 py-1 outline-none focus:outline-none"
                     data-tag={tag}
                   >
-                    <span class="">#{tag}</span>
+                    <span class="">{tag}</span>
                     <span class="text-theme-text-secondary">{count}</span>
                   </button>
                 ))
@@ -136,26 +133,30 @@ const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
 
           // Update active states for all filters
           tagFilters.forEach((f) => {
-            // Reset desktop styles
-            f.classList.remove('text-theme-text', 'font-bold');
-            f.classList.add('text-theme-text-secondary');
-
-            // Reset mobile styles
-            f.classList.remove(
-              'font-bold',
-              'text-theme-text',
-              'border-theme-text',
-            );
-            f.classList.add(
-              'font-normal',
-              'text-theme-text-secondary',
-              'border-theme-border',
-            );
+            if (f.closest('aside')) {
+              // Reset desktop styles only
+              f.classList.remove('text-theme-text', 'font-bold');
+              f.classList.add('text-theme-text-secondary');
+            } else {
+              // Reset mobile styles only
+              f.classList.remove(
+                'font-bold',
+                'text-theme-text',
+                'border-theme-text',
+              );
+              f.classList.add(
+                'font-normal',
+                'text-theme-text-secondary',
+                'border-theme-border',
+              );
+            }
           });
 
           // Find and activate the correct filter
           const activeFilters = Array.from(tagFilters).filter(
-            (f) => (f as HTMLElement).dataset && (f as HTMLElement).dataset!.tag === tag,
+            (f) =>
+              (f as HTMLElement).dataset &&
+              (f as HTMLElement).dataset!.tag === tag,
           );
           activeFilters.forEach((activeFilter) => {
             // Desktop active styles (only for desktop sidebar)
@@ -183,7 +184,8 @@ const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
           if (tag !== 'all') {
             noteItems.forEach((item) => {
               const noteTags =
-                (item as HTMLElement).dataset && (item as HTMLElement).dataset.tags
+                (item as HTMLElement).dataset &&
+                (item as HTMLElement).dataset.tags
                   ? (item as HTMLElement).dataset.tags!.split(',')
                   : [];
 
@@ -201,7 +203,9 @@ const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
         // Add click event listeners
         tagFilters.forEach((filter) => {
           filter.addEventListener('click', () => {
-            const selectedTag = (filter as HTMLElement).dataset && (filter as HTMLElement).dataset.tag;
+            const selectedTag =
+              (filter as HTMLElement).dataset &&
+              (filter as HTMLElement).dataset.tag;
             if (selectedTag) {
               setUrlParam('tag', selectedTag);
               applyFilter(selectedTag);

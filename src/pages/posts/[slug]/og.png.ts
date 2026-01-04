@@ -28,7 +28,7 @@ export async function GET({ props }: Props) {
           type: 'div',
           key: null,
           props: {
-            tw: 'shrink flex flex-col space-y-4',
+            tw: 'shrink flex flex-col',
             children: [
               {
                 type: 'div',

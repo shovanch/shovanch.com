@@ -1,6 +1,6 @@
 ---
 import RootLayout from '~/layouts/root-layout.astro';
-import Nav from '~/components/nav.astro';
+import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
 import BaseHead from '~/components/base-head.astro';
 import { defaultMeta } from '~/config/site';
 import PagefindSearch from 'astro-pagefind/components/Search';
@@ -13,6 +13,7 @@ import MobileTagsFilter from '~/components/mobile-tags-filter.astro';
 export const prerender = false;
 
 const query = Astro.url.searchParams.get('q') ?? undefined;
+const tag = Astro.url.searchParams.get('tag') ?? undefined;
 
 // Fetch posts from content collection
 const posts = (await getCollection('posts')).filter((post) => {
@@ -56,7 +57,7 @@ const totalWritings = posts.length + notes.length;
     />
   </head>
   <RootLayout>
-    <Nav />
+    <NavBreadcrumb section="search" />
 
     <main class="flex w-full flex-col gap-6" role="main">
       <header class="flex w-full flex-col gap-2">
@@ -93,16 +94,16 @@ const totalWritings = posts.length + notes.length;
         <div class="relative">
           <!-- Writings Section -->
           <div class="w-full">
-            <div
+<div
               class="writings-section prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2"
             >
               <h2
                 id="writings-title"
-                class="text-theme-text font-sans text-lg md:text-2xl"
+                class:list={["text-theme-text font-sans text-lg md:text-2xl", { hidden: !tag }]}
               >
-                Writings
+                {tag ? `Result for ${tag}` : ''}
               </h2>
-              <Writings />
+              <Writings showNotes />
             </div>
           </div>
 
@@ -133,7 +134,7 @@ const totalWritings = posts.length + notes.length;
                       aria-pressed="false"
                       aria-label={`Filter by ${tag} tag (${count} posts)`}
                     >
-                      <span class="">#{tag}</span>
+                      <span class="">{tag}</span>
                       <span class="text-theme-text-secondary">{count}</span>
                     </button>
                   ))
@@ -188,7 +189,7 @@ const totalWritings = posts.length + notes.length;
   /* Search input styling */
   #search .pagefind-ui__search-input,
   #search .pagefind-ui__search-clear {
-    @apply !pl-12 font-sans text-lg;
+    @apply pl-12! font-sans text-lg;
   }
 
   #search .pagefind-ui__search-input {
@@ -295,6 +296,7 @@ const totalWritings = posts.length + notes.length;
 
     waitForSearchInput((searchInput) => {
       const defaultContent = document.getElementById('default-content');
+      const writingsTitle = document.getElementById('writings-title');
 
       // Desktop tag filtering functionality for sidebar
       const desktopTagFilters = document.querySelectorAll('aside .tag-filter');
@@ -305,7 +307,7 @@ const totalWritings = posts.length + notes.length;
         return urlParams.get(param);
       }
 
-      // Function to apply desktop tag filter styling
+      // Function to apply desktop tag filter styling and show/hide writings
       function applyDesktopTagFilter(selectedTag) {
         const tag = selectedTag || 'all';
 
@@ -324,8 +326,18 @@ const totalWritings = posts.length + notes.length;
           activeFilter.classList.remove('text-theme-text-secondary');
           activeFilter.classList.add('text-theme-text', 'font-bold');
         });
-      }
 
+        // Show/hide writings title based on tag selection
+        if (writingsTitle) {
+          if (selectedTag && selectedTag !== 'all') {
+            writingsTitle.classList.remove('hidden');
+            writingsTitle.textContent = `Result for ${selectedTag}`;
+          } else {
+            writingsTitle.classList.add('hidden');
+            writingsTitle.textContent = '';
+          }
+        }
+      }
 
       // Function to toggle content based on search state
       function toggleContentBasedOnSearch() {

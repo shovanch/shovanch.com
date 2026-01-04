@@ -1,18 +1,32 @@
 ---
-import { MobileMenu } from './mobile-menu.tsx';
+import MobileMenuOverlay from './mobile-menu-overlay.astro';
 ---
 
 <nav
-  class="flex w-full flex-row items-center justify-between md:hidden"
+  class="relative z-50 flex w-full flex-row items-center justify-between md:hidden"
   aria-label="Mobile navigation"
 >
-  <!-- Left side: Mobile menu (React component) -->
+  <!-- Left side: Hamburger button (transforms to X when open) -->
   <div class="flex items-center">
-    <MobileMenu client:idle />
+    <button
+      id="mobile-menu-toggle"
+      aria-label="Toggle mobile menu"
+      aria-expanded="false"
+      class="hamburger-btn relative z-50 flex h-10 w-10 flex-col items-center justify-center rounded-sm transition-all duration-300 hover:bg-gray-800/20"
+    >
+      <div class="relative h-4 w-6">
+        <span
+          class="hamburger-line hamburger-line-1 absolute left-0 h-0.5 w-full rounded-sm bg-theme-text transition-all duration-300 ease-in-out"
+        ></span>
+        <span
+          class="hamburger-line hamburger-line-2 absolute left-0 h-0.5 w-full rounded-sm bg-theme-text transition-all duration-300 ease-in-out"
+        ></span>
+      </div>
+    </button>
   </div>
 
-  <!-- Right side: External navigation -->
-  <div
+  <!-- Right side: External navigation: hiding for minimalism -->
+  <!-- <div
     class="flex items-center gap-4 font-medium lowercase"
     role="group"
     aria-label="Quick navigation links"
@@ -22,14 +36,123 @@ import { MobileMenu } from './mobile-menu.tsx';
       class="focus:ring-theme-text px-2 py-1 font-sans text-lg md:text-xl"
       aria-label="About page"
     >
-      About
+      about
     </a>
     <a
-      href="/search"
+      href="/writings"
       class="focus:ring-theme-text px-2 py-1 font-sans text-lg md:text-xl"
       aria-label="Writings page"
     >
-      Writings
-    </a>
-  </div>
+      writings
+    </a> -->
 </nav>
+
+<!-- Full-screen overlay menu -->
+<MobileMenuOverlay />
+
+<script>
+  function initMobileMenu() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const backdrop = document.getElementById('mobile-menu-backdrop');
+    const overlay = document.getElementById('mobile-menu-overlay');
+
+    let scrollY = 0;
+
+    const openMenu = () => {
+      // Store scroll position before locking
+      scrollY = window.scrollY;
+
+      document.body.classList.add('mobile-menu-open');
+      toggle?.setAttribute('aria-expanded', 'true');
+
+      // Lock body scroll - fixed position approach
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeMenu = () => {
+      document.body.classList.remove('mobile-menu-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+
+      // Restore body scroll
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
+    };
+
+    // Toggle menu on hamburger/X click
+    toggle?.addEventListener('click', () => {
+      if (document.body.classList.contains('mobile-menu-open')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    // Close on backdrop click
+    backdrop?.addEventListener('click', closeMenu);
+
+    // Close menu when clicking nav links
+    overlay?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    // ESC key support
+    document.addEventListener('keydown', (e) => {
+      if (
+        e.key === 'Escape' &&
+        document.body.classList.contains('mobile-menu-open')
+      ) {
+        closeMenu();
+      }
+    });
+  }
+
+  // Initialize on page load
+  initMobileMenu();
+
+  // Re-initialize after Astro navigation (View Transitions)
+  document.addEventListener('astro:after-swap', initMobileMenu);
+</script>
+
+<style>
+  /* Hamburger lines default state */
+  .hamburger-line {
+    background-color: var(--theme-text);
+  }
+
+  .hamburger-line-1 {
+    top: 2px;
+  }
+
+  .hamburger-line-2 {
+    bottom: 2px;
+  }
+
+  /* Hamburger transforms to X when menu is open */
+  :global(.mobile-menu-open) .hamburger-btn {
+    z-index: 51;
+  }
+
+  :global(.mobile-menu-open) .hamburger-line {
+    background-color: var(--theme-text) !important;
+  }
+
+  :global(.mobile-menu-open) .hamburger-line-1 {
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  :global(.mobile-menu-open) .hamburger-line-2 {
+    bottom: 50%;
+    transform: translateY(50%) rotate(-45deg);
+  }
+</style>

@@ -28,7 +28,7 @@ const hasHiddenTags = mode === 'advanced' && tags.length > 7;
   <div class="flex flex-wrap gap-2" role="group" aria-label="Tag filters">
     <!-- All button -->
     <button
-      class="tag-filter border-theme-border text-theme-text-secondary flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+      class="tag-filter border-theme-border text-theme-text-secondary flex cursor-pointer items-center gap-1 rounded-full! border px-3 py-1 text-sm outline-none focus:outline-none"
       data-tag="all"
       aria-pressed="true"
       aria-label="Show all posts"
@@ -41,12 +41,12 @@ const hasHiddenTags = mode === 'advanced' && tags.length > 7;
     {
       visibleTags.map(([tag, count]) => (
         <button
-          class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+          class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 rounded-full! border px-3 py-1 text-sm outline-none focus:outline-none"
           data-tag={tag}
           aria-pressed="false"
           aria-label={`Filter by ${tag} tag (${count} posts)`}
         >
-          <span>#{tag}</span>
+          <span>{tag}</span>
           <span class="text-theme-text-secondary">({count})</span>
           {showCloseIcons && (
             <svg
@@ -69,10 +69,10 @@ const hasHiddenTags = mode === 'advanced' && tags.length > 7;
         <div id="extra-tags" class="hidden">
           {hiddenTags.map(([tag, count]) => (
             <button
-              class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+              class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 rounded-full! border px-3 py-1 text-sm outline-none focus:outline-none"
               data-tag={tag}
             >
-              <span>#{tag}</span>
+              <span>{tag}</span>
               <span class="text-theme-text-secondary">({count})</span>
               {showCloseIcons && (
                 <svg
@@ -95,7 +95,7 @@ const hasHiddenTags = mode === 'advanced' && tags.length > 7;
       hasHiddenTags && (
         <button
           id="show-all-tags"
-          class="border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 !rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+          class="border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 rounded-full! border px-3 py-1 text-sm outline-none focus:outline-none"
         >
           <span id="show-all-text">Show all</span>
         </button>

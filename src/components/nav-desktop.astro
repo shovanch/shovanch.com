@@ -1,6 +1,5 @@
 ---
 import NavLink from './nav-link.astro';
-import ThemeSwitcher from './theme-switcher.astro';
 import { menuItems } from '~/config/site';
 ---
 
@@ -13,13 +12,14 @@ import { menuItems } from '~/config/site';
     role="group"
     aria-label="Main navigation links"
   >
-    {menuItems.map((item) => <NavLink href={item.url}>{item.label}</NavLink>)}
+    <!-- Home, Search is not shown explicity on desktop nav, handled through menu overlay -->
+    {
+      menuItems
+        .filter((item) => !['home', 'search'].includes(item.label))
+        .map((item) => <NavLink href={item.url}>{item.label}</NavLink>)
+    }
   </div>
-  <div
-    class="flex items-center gap-3"
-    role="group"
-    aria-label="Search and theme options"
-  >
+  <div class="flex items-center gap-3" role="group" aria-label="Search options">
     <a
       href="/search"
       class="focus:ring-theme-text px-2 py-1 font-sans text-xl font-medium"
@@ -27,6 +27,5 @@ import { menuItems } from '~/config/site';
     >
       <span>search</span>
     </a>
-    <ThemeSwitcher />
   </div>
 </nav>
