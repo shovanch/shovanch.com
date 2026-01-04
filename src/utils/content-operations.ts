@@ -137,6 +137,6 @@ export function shouldGenerateStaticPath(item: PublishableContent): boolean {
     return true;
   }
 
-  // In production, only generate paths for published content
-  return item.data.isPublished !== false;
+  // In production, only generate paths for content with explicit isPublished: true
+  return item.data.isPublished === true;
 }

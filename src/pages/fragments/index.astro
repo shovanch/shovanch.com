@@ -1,0 +1,44 @@
+---
+import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
+import BaseHead from '~/components/base-head.astro';
+import { defaultMeta } from '~/config/site';
+import RootLayout from '~/layouts/root-layout.astro';
+import { getFragments } from '~/utils/get-fragments';
+import FragmentCard from '~/components/fragment-card.astro';
+
+const fragments = await getFragments();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title="Fragments  •  Shovan Chatterjee"
+      description={defaultMeta.description}
+    />
+  </head>
+  <RootLayout>
+    <NavBreadcrumb section="fragments" />
+
+    <main class="flex w-full flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-theme-text font-sans text-4xl font-semibold">
+          Fragments
+        </h1>
+      </div>
+
+      <div class="flex w-full flex-col md:mt-2">
+        {
+          fragments.map((fragment, index) => (
+            <>
+              <FragmentCard fragment={fragment} />
+              {index < fragments.length - 1 && (
+                <hr class="border-theme-text-secondary/40 my-10 border-t" />
+              )}
+            </>
+          ))
+        }
+      </div>
+    </main>
+  </RootLayout>
+</html>

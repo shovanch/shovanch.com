@@ -46,7 +46,9 @@ export const navigationConfig = {
     { label: 'home', url: '/' },
     { label: 'posts', url: '/posts' },
     { label: 'notes', url: '/notes' },
+    { label: 'fragments', url: '/fragments' },
     { label: 'about', url: '/about' },
+    { label: 'search', url: '/search' },
   ],
   socialLinks: [
     { label: 'email', url: `mailto:${siteConfig.email}` },

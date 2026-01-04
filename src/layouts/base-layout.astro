@@ -1,5 +1,6 @@
 ---
 import Navigation from '~/components/nav.astro';
+import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
 import BaseHead from '~/components/base-head.astro';
 import RootLayout from '~/layouts/root-layout.astro';
 import { formatDate } from '~/utils/format-date';
@@ -11,11 +12,14 @@ export type BaseLayoutProps = {
   publishedAt: string;
   slug: string;
   tags?: string[];
+  showTags?: boolean;
   readingTime?: string;
   renderOnClientRouter?: boolean;
   articleClass?: string;
   proseClass?: string;
   updatedAt?: string;
+  navType?: 'full' | 'breadcrumb';
+  contentSection?: 'posts' | 'notes' | 'fragments' | 'about' | 'search';
 };
 
 type Props = BaseLayoutProps;
@@ -30,6 +34,9 @@ const {
   readingTime,
   articleClass,
   proseClass,
+  navType = 'full',
+  contentSection = 'posts',
+  showTags = false,
 } = Astro.props;
 
 // Default prose styles from constants
@@ -57,7 +64,13 @@ const defaultProseClass = UI_CONSTANTS.PROSE.default;
     </a>
 
     <nav class="w-full" role="navigation" aria-label="Main navigation">
-      <Navigation />
+      {
+        navType === 'breadcrumb' ? (
+          <NavBreadcrumb section={contentSection} />
+        ) : (
+          <Navigation />
+        )
+      }
     </nav>
 
     <article
@@ -71,17 +84,10 @@ const defaultProseClass = UI_CONSTANTS.PROSE.default;
       <!-- Optional TOC slot -->
       <slot name="toc" />
 
-      <div class="flex w-full flex-col gap-6">
+      <div class="flex w-full flex-col gap-8">
         <header class="flex w-full flex-col gap-0">
-          <h1
-            data-pagefind-meta="title"
-            class="w-full font-sans text-3xl font-semibold md:text-3xl"
-          >
-            {title}
-          </h1>
-
           <div
-            class="text-theme-text-secondary mt-0.5 flex flex-row gap-2 font-sans text-base font-medium md:text-lg"
+            class="text-theme-text-secondary mb-3 flex flex-row gap-2 font-sans text-base font-medium md:text-lg"
           >
             <time
               datetime={publishedAt}
@@ -103,9 +109,15 @@ const defaultProseClass = UI_CONSTANTS.PROSE.default;
               )
             }
           </div>
+          <h1
+            data-pagefind-meta="title"
+            class="w-full font-sans text-3xl font-semibold md:text-3xl"
+          >
+            {title}
+          </h1>
 
           {
-            tags && tags.length > 0 && (
+            showTags && tags && tags.length > 0 && (
               <div
                 class="mt-2 flex flex-wrap gap-2"
                 role="group"
@@ -117,7 +129,7 @@ const defaultProseClass = UI_CONSTANTS.PROSE.default;
                     class="hover:bg-theme-border hover:text-theme-text focus:ring-theme-text px-2 py-1 text-sm font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
                     aria-label={`View all posts tagged with ${tag}`}
                   >
-                    #{tag}
+                    {tag}
                   </a>
                 ))}
               </div>

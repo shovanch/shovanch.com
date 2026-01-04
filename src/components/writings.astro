@@ -8,6 +8,12 @@ import {
 } from '~/utils/content-operations';
 import WritingCard from './writing-card.astro';
 
+type Props = {
+  showNotes?: boolean;
+};
+
+const { showNotes = false } = Astro.props;
+
 // Create compatible types
 type PostWithType = CollectionEntry<'posts'> & { type: 'post' };
 type NoteWithType = {
@@ -34,41 +40,44 @@ const posts = publishedPosts.map(
   }),
 );
 
-// Fetch notes from Obsidian and convert to compatible format
-const obsidianNotes = await getObsidianNotes();
-const publishedNotes = filterPublishedContent(obsidianNotes);
-const notes = publishedNotes.map((note): NoteWithType => {
-  // Process date the same way as in notes/[slug].astro
-  let publishedAt: string;
-  if (
-    note.data.publishedAt &&
-    !note.data.publishedAt.toString().startsWith('0002-')
-  ) {
-    // Always convert to YYYY-MM-DD format regardless of input type
-    const dateValue =
-      typeof note.data.publishedAt === 'string'
-        ? note.data.publishedAt.split('T')[0] // Remove time part if present
-        : new Date(note.data.publishedAt).toISOString().split('T')[0];
-    publishedAt = dateValue;
-  } else {
-    publishedAt = new Date().toISOString().split('T')[0];
-  }
+// Fetch notes from Obsidian and convert to compatible format (only if showNotes is true)
+let notes: NoteWithType[] = [];
+if (showNotes) {
+  const obsidianNotes = await getObsidianNotes();
+  const publishedNotes = filterPublishedContent(obsidianNotes);
+  notes = publishedNotes.map((note): NoteWithType => {
+    // Process date the same way as in notes/[slug].astro
+    let publishedAt: string;
+    if (
+      note.data.publishedAt &&
+      !note.data.publishedAt.toString().startsWith('0002-')
+    ) {
+      // Always convert to YYYY-MM-DD format regardless of input type
+      const dateValue =
+        typeof note.data.publishedAt === 'string'
+          ? note.data.publishedAt.split('T')[0] // Remove time part if present
+          : new Date(note.data.publishedAt).toISOString().split('T')[0];
+      publishedAt = dateValue;
+    } else {
+      publishedAt = new Date().toISOString().split('T')[0];
+    }
 
-  return {
-    id: note.id,
-    slug: note.slug,
-    data: {
-      title: note.data.title || 'Untitled',
-      publishedAt: publishedAt,
-      updatedAt: note.data.updatedAt,
-      tags: note.data.tags || [],
-      isPublished: note.data.isPublished ?? true,
-      showToc: note.data.showToc ?? true,
-    },
-    body: note.body,
-    type: 'note' as const,
-  };
-});
+    return {
+      id: note.id,
+      slug: note.slug,
+      data: {
+        title: note.data.title || 'Untitled',
+        publishedAt: publishedAt,
+        updatedAt: note.data.updatedAt,
+        tags: note.data.tags || [],
+        isPublished: note.data.isPublished ?? true,
+        showToc: note.data.showToc ?? true,
+      },
+      body: note.body,
+      type: 'note' as const,
+    };
+  });
+}
 
 // Combine and sort by publication date (updatedAt preferred over publishedAt)
 const combinedWritings: (PostWithType | NoteWithType)[] = [...posts, ...notes];
@@ -77,11 +86,11 @@ const allWritings = sortContentByDate(combinedWritings);
 
 <section
   id="writings"
-  class="prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2 flex flex-col"
+  class="prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2 mb-16 flex flex-col"
 >
   <h2 class="text-theme-text font-sans">Writings</h2>
 
-  <ul class="not-prose flex flex-col gap-4 pl-0 md:gap-6">
+  <ul class="not-prose flex flex-col gap-4 pl-0 md:gap-4">
     {allWritings.map((writing) => <WritingCard post={writing} />)}
   </ul>
 </section>

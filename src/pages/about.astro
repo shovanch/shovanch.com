@@ -2,7 +2,7 @@
 import BaseHead from '~/components/base-head.astro';
 import { defaultMeta } from '~/config/site';
 import RootLayout from '~/layouts/root-layout.astro';
-import Navigation from '~/components/nav.astro';
+import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
 import { getEntry, render } from 'astro:content';
 import { UI_CONSTANTS } from '~/constants/ui-constants';
 
@@ -26,7 +26,7 @@ const { Content } = await render(aboutEntry);
   </head>
 
   <RootLayout>
-    <Navigation />
+    <NavBreadcrumb section="about" />
 
     <article class:list={[UI_CONSTANTS.PROSE.default, 'mt-8 md:mt-16']}>
       <Content />

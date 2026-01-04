@@ -1,6 +1,6 @@
 ---
 import RootLayout from '~/layouts/root-layout.astro';
-import Nav from '~/components/nav.astro';
+import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
 import BaseHead from '~/components/base-head.astro';
 import { defaultMeta } from '~/config/site';
 import PagefindSearch from 'astro-pagefind/components/Search';
@@ -56,7 +56,7 @@ const totalWritings = posts.length + notes.length;
     />
   </head>
   <RootLayout>
-    <Nav />
+    <NavBreadcrumb section="search" />
 
     <main class="flex w-full flex-col gap-6" role="main">
       <header class="flex w-full flex-col gap-2">
@@ -102,7 +102,7 @@ const totalWritings = posts.length + notes.length;
               >
                 Writings
               </h2>
-              <Writings />
+              <Writings showNotes />
             </div>
           </div>
 
@@ -133,7 +133,7 @@ const totalWritings = posts.length + notes.length;
                       aria-pressed="false"
                       aria-label={`Filter by ${tag} tag (${count} posts)`}
                     >
-                      <span class="">#{tag}</span>
+                      <span class="">{tag}</span>
                       <span class="text-theme-text-secondary">{count}</span>
                     </button>
                   ))
@@ -188,7 +188,7 @@ const totalWritings = posts.length + notes.length;
   /* Search input styling */
   #search .pagefind-ui__search-input,
   #search .pagefind-ui__search-clear {
-    @apply !pl-12 font-sans text-lg;
+    @apply pl-12! font-sans text-lg;
   }
 
   #search .pagefind-ui__search-input {
@@ -325,7 +325,6 @@ const totalWritings = posts.length + notes.length;
           activeFilter.classList.add('text-theme-text', 'font-bold');
         });
       }
-
 
       // Function to toggle content based on search state
       function toggleContentBasedOnSearch() {

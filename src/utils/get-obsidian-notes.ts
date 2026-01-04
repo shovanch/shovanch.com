@@ -37,8 +37,8 @@ export async function getObsidianNotes(): Promise<ObsidianNote[]> {
       // In dev mode, show all non-system files
       if (isDevEnv) return true;
 
-      // In production, require publishedAt and isPublished !== false
-      return note.data.publishedAt && note.data.isPublished !== false;
+      // In production, require publishedAt and explicit isPublished: true
+      return note.data.publishedAt && note.data.isPublished === true;
     })
     .map((note) => ({
       id: note.id,

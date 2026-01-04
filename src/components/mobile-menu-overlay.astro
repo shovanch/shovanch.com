@@ -1,6 +1,6 @@
 ---
 import NavLink from './nav-link.astro';
-import ThemeSwitcher from './theme-switcher.astro';
+import SocialLinks from './social-links.astro';
 import { menuItems } from '~/config/site';
 
 type Props = {
@@ -12,111 +12,55 @@ const { class: className = '' } = Astro.props;
 
 <div
   id="mobile-menu-overlay"
-  class={`fixed inset-0 z-40 flex items-center justify-center transition-all duration-300 ease-in-out ${className}`}
+  class={`fixed inset-0 z-40 flex flex-col transition-all duration-300 ease-in-out ${className}`}
   style="visibility: hidden; opacity: 0;"
   aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Mobile navigation menu"
 >
   <!-- Background overlay -->
   <div
-    class="absolute inset-0 bg-slate-900/95 backdrop-blur-sm"
+    class="absolute inset-0 bg-theme-bg/95 backdrop-blur-sm"
     id="mobile-menu-backdrop"
   >
   </div>
 
   <!-- Menu content -->
   <div
-    class="relative z-10 flex h-full w-full flex-col items-start justify-start p-8 pt-20"
+    class="relative z-10 mx-auto mt-32 flex h-full w-full max-w-3xl flex-col p-4 md:mt-0 md:justify-center"
     id="mobile-menu-content"
   >
-    <!-- Close button (X) -->
-    <button
-      id="mobile-menu-close"
-      aria-label="Close mobile menu"
-      class="absolute top-8 right-8 z-50 flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors duration-200 hover:bg-white/10"
-    >
-      <svg
-        class="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
-
     <!-- Navigation links -->
-    <nav class="flex flex-col gap-8">
+    <nav class="flex flex-col gap-7">
       {
-        menuItems.map((item, index) => (
-          <div
-            class="menu-link-wrapper"
-            style={`animation-delay: ${(index + 1) * 100}ms; opacity: 0; transform: translateY(20px);`}
+        menuItems.map((item) => (
+          <NavLink
+            href={item.url}
+            class="mobile-menu-link block w-max py-2 text-3xl! font-semibold text-theme-text-secondary capitalize transition-all duration-200 hover:text-theme-text"
           >
-            <NavLink
-              href={item.url}
-              class="mobile-menu-link block text-4xl font-bold tracking-wide text-yellow-400 uppercase transition-all duration-200 hover:translate-x-2 hover:text-yellow-300"
-            >
-              {item.label}
-            </NavLink>
-          </div>
+            {item.label}
+          </NavLink>
         ))
       }
     </nav>
 
-    <!-- Theme switcher in bottom area -->
-    <div
-      class="menu-link-wrapper absolute right-8 bottom-8"
-      style="animation-delay: 600ms; opacity: 0; transform: translateY(20px);"
-    >
-      <ThemeSwitcher />
+    <!-- Social links at bottom -->
+    <div class="mt-16">
+      <SocialLinks />
     </div>
   </div>
 </div>
 
 <style>
-  /* Menu open animations */
-  .mobile-menu-open #mobile-menu-overlay {
+  /* Menu open animations - whole overlay fades in together */
+  :global(.mobile-menu-open) #mobile-menu-overlay {
     visibility: visible !important;
     opacity: 1 !important;
   }
 
-  .mobile-menu-open .menu-link-wrapper {
-    animation: slideInUp 0.4s ease-out forwards;
-  }
-
-  @keyframes slideInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
   /* Prevent body scroll when menu is open */
-  .mobile-menu-open {
+  :global(.mobile-menu-open) {
     overflow: hidden;
-  }
-
-  /* Link hover effect */
-  .mobile-menu-link {
-    position: relative;
-  }
-
-  .mobile-menu-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: currentColor;
-    transition: width 0.3s ease-out;
-  }
-
-  .mobile-menu-link:hover::after {
-    width: 100%;
   }
 </style>
