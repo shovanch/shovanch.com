@@ -135,4 +135,5 @@ dist
 .astro
 /public/notes/
 /public/vault/
+src/content/notes/
 
