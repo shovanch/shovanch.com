@@ -1,0 +1,26 @@
+---
+import { exploreLinks } from '~/config/site';
+---
+
+<section class="not-prose mt-6 flex flex-col gap-4" id="explore">
+  <h3 class="text-theme-text-secondary font-sans text-lg font-medium">
+    Explore
+  </h3>
+  <ul class="flex flex-col gap-2">
+    {
+      exploreLinks.map((link) => (
+        <li class="flex flex-col text-xl md:flex-row md:items-baseline md:gap-2">
+          <a
+            href={link.url}
+            class="text-theme-text hover:text-theme-link -ml-1 w-max shrink-0 font-semibold transition-colors"
+          >
+            {link.title}
+          </a>
+          <span class="text-theme-text-secondary text-base md:text-xl">
+            {link.description}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</section>

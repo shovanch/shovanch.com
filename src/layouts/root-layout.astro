@@ -1,10 +1,13 @@
 ---
+
 ---
 
 <script is:inline>
   // eslint-disable-next-line ts/explicit-function-return-type
   function setThemeMode() {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    ).matches;
 
     // Remove all theme classes
     document.documentElement.classList.remove('dark', 'blue');
@@ -19,14 +22,16 @@
   setThemeMode();
 
   // Listen for system preference changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setThemeMode);
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', setThemeMode);
 </script>
 <div
   id="root-container"
   class="relative flex min-h-screen flex-col overflow-x-hidden antialiased"
 >
   <div
-    class="relative mx-auto mt-2 mb-auto flex w-full max-w-3xl flex-col items-center justify-start p-4 md:mt-6"
+    class="relative mx-auto mt-2 mb-auto flex w-full max-w-3xl flex-col items-center justify-start p-4 pb-24 md:mt-6"
   >
     <main class="flex w-full flex-col gap-10 md:gap-12">
       <slot />

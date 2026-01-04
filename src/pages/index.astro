@@ -4,7 +4,7 @@ import { defaultMeta } from '~/config/site';
 import RootLayout from '~/layouts/root-layout.astro';
 import Navigation from '~/components/nav.astro';
 import { Image } from 'astro:assets';
-import Writings from '~/components/writings.astro';
+import HomeWritings from '~/components/home-writings.astro';
 import HeroBackground from '~/components/hero-background.astro';
 import SocialLinks from '~/components/social-links.astro';
 import { UI_CONSTANTS } from '~/constants/ui-constants';
@@ -12,6 +12,7 @@ import { UI_CONSTANTS } from '~/constants/ui-constants';
 import { getCollection } from 'astro:content';
 import { render } from 'astro:content';
 import Signature from '~/components/signature.astro';
+import ExploreLinks from '~/components/explore-links.astro';
 
 // Fetch hero content from Obsidian notes
 const notes = await getCollection('notes');
@@ -33,7 +34,7 @@ const { Content: HeroContent } = heroNote
   <RootLayout>
     <Navigation />
 
-    <section class="mt-4 -mb-4 flex flex-row items-center gap-4 md:mt-8">
+    <section class="mt-4 -mb-4 flex flex-row items-center gap-4 md:mt-32">
       <Image
         priority
         src="/images/avatar.webp"
@@ -64,6 +65,8 @@ const { Content: HeroContent } = heroNote
       <SocialLinks />
     </section>
 
-    <Writings />
+    <ExploreLinks />
+
+    <HomeWritings />
   </RootLayout>
 </html>

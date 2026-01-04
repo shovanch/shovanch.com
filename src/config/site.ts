@@ -24,6 +24,12 @@ export type SocialLink = {
   url: string;
 };
 
+export type ExploreLink = {
+  title: string;
+  description: string;
+  url: string;
+};
+
 // Site metadata and SEO configuration
 export const siteConfig = {
   url: 'https://shovanch.com',
@@ -75,6 +81,26 @@ export const performanceConfig = {
   cacheMaxAge: 31536000, // 1 year in seconds
   prefetchStrategy: 'viewport' as const,
 } as const;
+
+// Explore links for homepage directory
+export const exploreLinks: ExploreLink[] = [
+  {
+    title: 'Posts',
+    description: "Essays I've taken time to finish",
+    url: '/posts',
+  },
+  {
+    title: 'Notes',
+    description: "Stuff I'm learning, mostly for myself",
+    url: '/notes',
+  },
+  {
+    title: 'Fragments',
+    description: 'Stray thoughts, links, tiny updates',
+    url: '/fragments',
+  },
+  { title: 'Search', description: 'Everything I’ve written', url: '/search' },
+];
 
 // Re-export for backward compatibility (from the old data/index.ts)
 export const menuItems: MenuItem[] = [...navigationConfig.mainMenu];
