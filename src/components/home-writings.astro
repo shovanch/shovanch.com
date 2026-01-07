@@ -89,7 +89,11 @@ const allWritings = sortContentByDate(combinedWritings);
     Recent
   </h3>
 
-  <ul class="not-prose flex flex-col gap-4 pl-0 md:gap-4">
-    {allWritings.map((writing) => <WritingCard post={writing} />)}
+  <ul class="not-prose flex flex-col gap-2 pl-0 md:gap-3">
+    {
+      allWritings.map((writing) => (
+        <WritingCard post={writing} showDate={false} />
+      ))
+    }
   </ul>
 </section>

@@ -18,18 +18,16 @@ const displayDate = publishedAt || updatedAt;
 ---
 
 <article class="fragment-item">
-  <div class="mb-6 flex items-center gap-2">
+  <div class="mb-2 flex items-center gap-1.5 sm:mb-3 sm:gap-2">
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      class="text-theme-text-secondary"
+      class="text-theme-text-secondary h-4 w-4 sm:h-5 sm:w-5"
     >
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
       <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -38,7 +36,7 @@ const displayDate = publishedAt || updatedAt;
     </svg>
     <time
       datetime={displayDate || ''}
-      class="text-theme-text-secondary font-sans text-lg font-semibold"
+      class="text-theme-text-secondary font-sans text-base font-semibold sm:text-lg"
     >
       {displayDate ? formatDate(displayDate) : ''}
     </time>

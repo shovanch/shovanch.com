@@ -9,9 +9,10 @@ type Writing = PostWithType | NoteWithType;
 
 type Props = {
   post: Writing;
+  showDate?: boolean;
 };
 
-const { post } = Astro.props;
+const { post, showDate } = Astro.props;
 
 // Type guard
 const isPost = (post: Writing): post is PostWithType => post.type === 'post';
@@ -34,4 +35,5 @@ const showExcerpt = isPost(post); // Only show excerpts for posts
   contentType={contentType}
   showExcerpt={showExcerpt}
   showType={true}
+  showDate={showDate}
 />

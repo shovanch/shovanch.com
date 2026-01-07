@@ -12,6 +12,7 @@ export type BaseCardProps = {
   contentType?: ContentType;
   showExcerpt?: boolean;
   showType?: boolean;
+  showDate?: boolean;
 };
 
 type Props = BaseCardProps;
@@ -23,6 +24,7 @@ const {
   tags,
   renderOnClientRouter = true,
   contentType = 'post',
+  showDate = true,
 } = Astro.props;
 
 const linkProps = renderOnClientRouter ? {} : { 'data-astro-reload': '' };
@@ -44,11 +46,15 @@ const ariaLabel = `Read ${contentType}: ${title}`;
     >
       {title}
     </a>
-    <time
-      datetime={publishedAt}
-      class="text-theme-text-secondary shrink-0 font-sans text-base font-medium"
-    >
-      {formatDate(publishedAt)}
-    </time>
+    {
+      showDate && (
+        <time
+          datetime={publishedAt}
+          class="text-theme-text-secondary shrink-0 font-sans text-base font-medium"
+        >
+          {formatDate(publishedAt)}
+        </time>
+      )
+    }
   </div>
 </li>

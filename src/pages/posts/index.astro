@@ -54,7 +54,7 @@ const sortedYears = Object.keys(postsByYear)
               </h2>
               <ul class="flex flex-col gap-3">
                 {postsByYear[year].map((post) => (
-                  <li class="flex items-start justify-between gap-4">
+                  <li class="flex items-start justify-between gap-3">
                     <a
                       href={`/posts/${post.id}`}
                       class="text-theme-text hover:text-theme-text-secondary font-serif text-lg font-semibold transition-colors duration-200 md:text-xl"
