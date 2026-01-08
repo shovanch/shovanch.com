@@ -1,118 +1,34 @@
 ---
+/**
+ * Alias redirect handler for promoted notes
+ *
+ * Creates 301 redirects from alias routes to canonical routes.
+ * Only generates routes for notes that are promoted to surfaces.
+ *
+ * Example: /notes/ddia-concurrency → 301 → /notes/ddia/concurrency
+ */
 import type { GetStaticPaths } from 'astro';
-import { getCollection, render as renderMarkdown } from 'astro:content';
-import { getReadingTime } from '~/utils/reading-time';
-import { generateToc } from '~/utils/toc';
-import { generateSlugFromId, extractTitleFromId } from '~/utils/slug-mapping';
 import {
-  shouldGenerateStaticPath,
-  validateContentAccess,
-} from '~/utils/content-operations';
-import NoteLayout from '~/layouts/note-layout.astro';
-import { BookCover } from '~/components/book-cover';
+  buildNoteManifest,
+  validateManifest,
+  getAliasPaths,
+} from '~/lib/notes/manifest';
 
 export const getStaticPaths = (async () => {
-  const notes = await getCollection('notes');
+  // Build and validate manifest
+  const manifest = await buildNoteManifest();
+  validateManifest(manifest);
 
-  return notes
-    .filter((note) => {
-      // Filter out system files
-      const isSystemFile =
-        note.id.startsWith('.') ||
-        note.id.includes('/.') ||
-        note.id.startsWith('Excalidraw/') ||
-        note.id.includes('excalidraw/') ||
-        note.id.startsWith('note-template/') ||
-        note.id.includes('.excalidraw') ||
-        note.id.includes('Untitled') ||
-        note.id.includes('Drawing ');
-
-      if (isSystemFile) return false;
-
-      // Also filter by publication status for static generation
-      return shouldGenerateStaticPath(note);
-    })
-    .map((note) => ({
-      params: { slug: note.data.slug || generateSlugFromId(note.id) },
-      props: { note },
-    }));
+  // Get only alias paths (not canonical routes)
+  return getAliasPaths(manifest);
 }) satisfies GetStaticPaths;
 
-const { note } = Astro.props;
-
-// Validate access to this content
-try {
-  validateContentAccess(note);
-} catch {
-  return Astro.redirect('/404');
+interface Props {
+  canonicalRoute: string;
 }
 
-// Render the content and extract headings
-const { Content, headings } = await renderMarkdown(note);
+const { canonicalRoute } = Astro.props;
 
-// Calculate reading time and generate TOC
-const readingTime = getReadingTime(note.body || '');
-const tocHeadings =
-  (note.data.showToc ?? true) ? generateToc(headings, 2, 6) : undefined;
-
-// Get valid date - ensure it's in YYYY-MM-DD format
-let publishedAt: string;
-if (
-  note.data.publishedAt &&
-  !note.data.publishedAt.toString().startsWith('0002-')
-) {
-  // Always convert to YYYY-MM-DD format regardless of input type
-  const dateValue =
-    typeof note.data.publishedAt === 'string'
-      ? note.data.publishedAt.split('T')[0] // Remove time part if present
-      : new Date(note.data.publishedAt).toISOString().split('T')[0];
-  publishedAt = dateValue;
-} else {
-  publishedAt = new Date().toISOString().split('T')[0];
-}
-
-// Convert coverImage path to web-accessible format
-const getCoverImageSrc = (coverImage: string) => {
-  // Handle wikilink format: [[IMG-20250815093239222](assets/path/to/image.webp)]
-  const wikilinkMatch = coverImage.match(/\[([^\]]+)\]\(([^)]+)\)/);
-  if (wikilinkMatch) {
-    const imagePath = wikilinkMatch[2];
-    return `/notes/${imagePath}`;
-  }
-
-  // Handle direct path format: assets/path/to/image.webp
-  if (coverImage.startsWith('assets/')) {
-    return `/notes/${coverImage}`;
-  }
-
-  // Handle absolute path format: /notes/assets/path/to/image.webp
-  if (coverImage.startsWith('/notes/assets/')) {
-    return coverImage;
-  }
-
-  // Default: assume it's relative to notes assets
-  return `/notes/assets/${coverImage}`;
-};
+// 301 permanent redirect to canonical URL
+return Astro.redirect(`/notes/${canonicalRoute}`, 301);
 ---
-
-<NoteLayout
-  title={note.data.title || extractTitleFromId(note.id)}
-  summary=""
-  publishedAt={publishedAt}
-  tags={note.data.tags || []}
-  slug={note.data.slug || generateSlugFromId(note.id)}
-  showToc={note.data.showToc ?? true}
-  headings={tocHeadings}
-  readingTime={readingTime}
->
-  {
-    note.data.type?.includes('book') && note.data.coverImage && (
-      <BookCover
-        src={getCoverImageSrc(note.data.coverImage)}
-        alt={note.data.title || extractTitleFromId(note.id)}
-        size="large"
-      />
-    )
-  }
-  <Content />
-</NoteLayout>

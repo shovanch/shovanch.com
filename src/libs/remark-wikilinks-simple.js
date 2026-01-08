@@ -27,7 +27,7 @@ function extractTitleFromId(id) {
 
 // Build mapping from note titles/filenames to their actual slugs
 function buildSlugMappingSync() {
-  const notesDir = path.resolve('src/content/notes');
+  const notesDir = path.resolve('src/content/vault');
   const slugMapping = new Map();
 
   if (!fs.existsSync(notesDir)) {
