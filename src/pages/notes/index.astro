@@ -1,17 +1,89 @@
 ---
+/**
+ * Notes index page
+ *
+ * Lists only notes that are promoted to the 'notes' surface.
+ * Nested-only notes (those without surfaces or with different surfaces) do not appear.
+ */
 import NavBreadcrumb from '~/components/nav-breadcrumb.astro';
 import BaseHead from '~/components/base-head.astro';
 import { defaultMeta } from '~/config/site';
 import RootLayout from '~/layouts/root-layout.astro';
-import { getObsidianNotes } from '~/utils/get-obsidian-notes';
 import NoteCard from '~/components/note-card.astro';
 import { filterAndSortContent } from '~/utils/content-operations';
 import MobileTagsFilter from '~/components/mobile-tags-filter.astro';
+import { buildNoteManifest, validateManifest } from '~/lib/notes/manifest';
+import type { NoteEntry } from '~/lib/notes/types';
+import type { ObsidianNote } from '~/utils/get-obsidian-notes';
+import { isDevEnv } from '~/utils/is-dev-env';
 
-const allNotes = await getObsidianNotes();
+// Build manifest and get promoted notes
+const manifest = await buildNoteManifest();
+validateManifest(manifest);
+
+// Logic for showing notes on index:
+// 1. Flat files (notes/*.md) → always show (canonical route has no slashes)
+// 2. Nested files (notes/DDIA/*.md) → only show if surfaces includes 'notes'
+const promotedEntries = manifest.entries.filter((entry) => {
+  const isFlat = !entry.canonicalRoute.includes('/');
+  const isPromotedSurface = entry.frontmatter.surfaces?.includes('notes');
+  return isFlat || isPromotedSurface;
+});
+
+// Helper function to validate dates
+function getValidDate(
+  dateValue: string | Date | undefined,
+): string | undefined {
+  if (!dateValue) return undefined;
+  const dateStr =
+    typeof dateValue === 'string' ? dateValue : dateValue.toISOString();
+  if (dateStr.startsWith('0002-') || dateStr.length < 8) {
+    return undefined;
+  }
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return undefined;
+    }
+    return date.toISOString();
+  } catch {
+    return undefined;
+  }
+}
+
+// Convert manifest entries to ObsidianNote format for NoteCard
+function toObsidianNote(entry: NoteEntry): ObsidianNote {
+  return {
+    id: entry.id,
+    // Use canonicalRoute for the URL instead of slug
+    slug: entry.canonicalRoute,
+    data: {
+      title: entry.title || entry.id,
+      publishedAt:
+        getValidDate(entry.frontmatter.publishedAt) || new Date().toISOString(),
+      updatedAt: getValidDate(entry.frontmatter.updatedAt),
+      tags: entry.frontmatter.tags || [],
+      isPublished: entry.frontmatter.isPublished,
+      showToc: entry.frontmatter.showToc ?? true,
+      type: entry.frontmatter.type,
+    },
+    body: entry.body,
+  };
+}
+
+// Filter by publication status
+const filteredEntries = promotedEntries.filter((entry) => {
+  // In dev mode, show all promoted notes
+  if (isDevEnv) return true;
+  // In production, require isPublished: true
+  return entry.frontmatter.isPublished === true;
+});
+
+// Convert to ObsidianNote format
+const allNotes = filteredEntries.map(toObsidianNote);
+
+// Sort by date
 const filteredNotes = filterAndSortContent(allNotes);
-
-// Use filtered notes directly without year grouping
 const sortedNotes = filteredNotes;
 
 // Get all unique tags with counts
@@ -60,9 +132,21 @@ const sortedTags = Object.entries(tagCounts).sort(([, a], [, b]) => b - a);
           class="prose md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-a:decoration-none prose-a:underline-offset-2 flex w-full flex-col md:mt-2"
         >
           <div id="notes-container">
-            <ul class="not-prose flex flex-col gap-3 pl-0">
-              {sortedNotes.map((note) => <NoteCard post={note} />)}
-            </ul>
+            {
+              sortedNotes.length > 0 ? (
+                <ul class="not-prose flex flex-col gap-3 pl-0">
+                  {sortedNotes.map((note) => (
+                    <NoteCard post={note} />
+                  ))}
+                </ul>
+              ) : (
+                <p class="text-theme-text-secondary">
+                  No notes have been promoted yet. Add{' '}
+                  <code>surfaces: ['notes']</code> to your note frontmatter to
+                  show them here.
+                </p>
+              )
+            }
           </div>
         </div>
 

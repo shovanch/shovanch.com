@@ -1,0 +1,199 @@
+---
+/**
+ * Canonical route handler for notes
+ *
+ * Renders notes at their canonical filesystem-derived paths.
+ * Example: notes/DDIA/Concurrency.md → /notes/ddia/concurrency
+ */
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render as renderMarkdown } from 'astro:content';
+import { getReadingTime } from '~/utils/reading-time';
+import { generateToc } from '~/utils/toc';
+import { extractTitleFromId } from '~/utils/slug-mapping';
+import {
+  shouldGenerateStaticPath,
+  validateContentAccess,
+} from '~/utils/content-operations';
+import NoteLayout from '~/layouts/note-layout.astro';
+import { BookCover } from '~/components/book-cover';
+import {
+  buildNoteManifest,
+  validateManifest,
+  getCanonicalPaths,
+} from '~/lib/notes/manifest';
+import type { NoteEntry } from '~/lib/notes/types';
+import type { CollectionEntry } from 'astro:content';
+
+export const getStaticPaths = (async () => {
+  // Build and validate manifest
+  const manifest = await buildNoteManifest();
+  validateManifest(manifest);
+
+  // Get all notes from Astro collection for rendering
+  const allNotes = await getCollection('notes');
+
+  // Helper function to find collection entry from manifest entry
+  const findCollectionEntry = (
+    manifestEntry: NoteEntry
+  ): CollectionEntry<'notes'> | undefined => {
+    // Astro glob loader generates collection IDs as slugified paths relative to base
+    // e.g., src/content/vault/notes/DDIA/Concurrency.md → "notes/ddia/concurrency"
+    // e.g., src/content/vault/notes/DDIA/index.md → "notes/ddia/index"
+
+    const canonicalRoute = manifestEntry.canonicalRoute;
+
+    // Build list of possible IDs to match
+    const possibleIds: string[] = [];
+
+    // Check if this is from an index.md file (canonical route equals parent dir)
+    const isIndexFile = manifestEntry.sourcePath.endsWith('/index.md') ||
+                        manifestEntry.sourcePath.endsWith('\\index.md');
+
+    if (isIndexFile) {
+      // For index.md files:
+      // - canonical route is "ddia" (parent folder)
+      // - collection ID is "notes/ddia/index"
+      possibleIds.push(
+        `notes/${canonicalRoute}/index`,   // notes/ddia/index
+        `${canonicalRoute}/index`,         // ddia/index
+      );
+    }
+
+    // Standard path-based IDs (works for non-index files)
+    possibleIds.push(
+      `notes/${canonicalRoute}`,           // notes/ddia/reliability-scalability
+      canonicalRoute,                      // ddia/reliability-scalability
+      manifestEntry.slug,                  // just the slug
+    );
+
+    const found = allNotes.find((note) => {
+      const noteIdLower = note.id.toLowerCase();
+      return possibleIds.some(id => {
+        if (!id) return false;
+        const idLower = id.toLowerCase();
+        return (
+          noteIdLower === idLower ||
+          noteIdLower.endsWith(`/${idLower}`)
+        );
+      });
+    });
+
+    return found;
+  };
+
+  // Generate paths from manifest
+  const paths = getCanonicalPaths(manifest)
+    .map(({ params, props }) => {
+      const collectionEntry = findCollectionEntry(props.entry);
+
+      // Check if this note should be generated
+      if (!collectionEntry || !shouldGenerateStaticPath(collectionEntry)) {
+        return null;
+      }
+
+      return {
+        params,
+        props: {
+          entry: props.entry,
+          collectionEntry,
+        },
+      };
+    })
+    .filter(
+      (p): p is NonNullable<typeof p> =>
+        p !== null && p.props.collectionEntry !== undefined
+    );
+
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props {
+  entry: NoteEntry;
+  collectionEntry: CollectionEntry<'notes'>;
+}
+
+const { entry, collectionEntry } = Astro.props;
+
+// Validate access to this content
+try {
+  validateContentAccess(collectionEntry);
+} catch {
+  return Astro.redirect('/404');
+}
+
+// Render the content and extract headings
+const { Content, headings } = await renderMarkdown(collectionEntry);
+
+// Calculate reading time and generate TOC
+const readingTime = getReadingTime(collectionEntry.body || '');
+const showToc = collectionEntry.data.showToc ?? true;
+const tocHeadings = showToc ? generateToc(headings, 2, 6) : undefined;
+
+// Get valid date - ensure it's in YYYY-MM-DD format
+let publishedAt: string;
+if (
+  collectionEntry.data.publishedAt &&
+  !collectionEntry.data.publishedAt.toString().startsWith('0002-')
+) {
+  const dateValue =
+    typeof collectionEntry.data.publishedAt === 'string'
+      ? collectionEntry.data.publishedAt.split('T')[0]
+      : new Date(collectionEntry.data.publishedAt).toISOString().split('T')[0];
+  publishedAt = dateValue;
+} else {
+  publishedAt = new Date().toISOString().split('T')[0];
+}
+
+// Build canonical URL for meta tags
+const canonicalUrl = new URL(
+  `/notes/${entry.canonicalRoute}`,
+  Astro.site
+).href;
+
+// Get title
+const title =
+  collectionEntry.data.title || entry.title || extractTitleFromId(collectionEntry.id);
+
+// Convert coverImage path to web-accessible format
+const getCoverImageSrc = (coverImage: string) => {
+  const wikilinkMatch = coverImage.match(/\[([^\]]+)\]\(([^)]+)\)/);
+  if (wikilinkMatch) {
+    const imagePath = wikilinkMatch[2];
+    return `/notes/${imagePath}`;
+  }
+  if (coverImage.startsWith('assets/')) {
+    return `/notes/${coverImage}`;
+  }
+  if (coverImage.startsWith('/notes/assets/')) {
+    return coverImage;
+  }
+  return `/notes/assets/${coverImage}`;
+};
+---
+
+<NoteLayout
+  title={title}
+  summary=""
+  publishedAt={publishedAt}
+  slug={entry.slug}
+  tags={collectionEntry.data.tags || []}
+  headings={tocHeadings}
+  readingTime={readingTime}
+  showToc={showToc}
+>
+  <Fragment slot="head">
+    <link rel="canonical" href={canonicalUrl} />
+  </Fragment>
+
+  {
+    collectionEntry.data.type?.includes('book') &&
+      collectionEntry.data.coverImage && (
+        <BookCover
+          src={getCoverImageSrc(collectionEntry.data.coverImage)}
+          alt={title}
+          size="large"
+        />
+      )
+  }
+  <Content />
+</NoteLayout>

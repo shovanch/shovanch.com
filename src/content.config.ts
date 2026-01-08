@@ -90,6 +90,8 @@ const notes = defineCollection({
   }),
   schema: z
     .object({
+      // Stable identifier for routing - once set, never change
+      id: z.string().optional(),
       title: z.string().optional(),
       publishedAt: dateSchema.optional(),
       updatedAt: dateSchema.optional(),
@@ -109,6 +111,12 @@ const notes = defineCollection({
         .optional()
         .transform((val) => val || []),
       coverImage: z.string().nullable().optional(),
+      // Surface-based promotion: which index pages should show this note
+      // Empty array = nested-only (no alias route), ['notes'] = promote to /notes index
+      surfaces: z
+        .union([z.array(z.string().trim().min(1)), z.null()])
+        .optional()
+        .transform((val) => val || []),
     })
     .transform((data) => ({
       ...data,
