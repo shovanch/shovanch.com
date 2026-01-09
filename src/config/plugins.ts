@@ -9,10 +9,11 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { rehypeImageCaptions } from '../libs/rehype-image-captions';
 import { rehypeRawHtmlInCode } from '../libs/rehype-raw-html-in-code';
 import { rehypeToc } from '../libs/rehype-toc';
+import { remarkSidenotes } from '../libs/remark-sidenotes';
 import { remarkWikilinksSimple } from '../libs/remark-wikilinks-simple.js';
 
 // Plugin configurations
-export const remarkPlugins = [remarkWikilinksSimple];
+export const remarkPlugins = [remarkWikilinksSimple, remarkSidenotes];
 
 export const rehypePlugins: any[] = [
   rehypeToc,

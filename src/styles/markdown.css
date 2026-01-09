@@ -175,3 +175,24 @@ figure.obsidian-image figcaption {
     max-width: calc(100vw - 2rem) !important;
   }
 }
+
+/* Sidenotes - Tufte-style marginal notes */
+aside.sidenote {
+  /* Mobile/tablet: inline with muted styling */
+  @apply text-theme-text-secondary my-4 pl-3;
+}
+
+aside.sidenote p {
+  @apply text-theme-text-secondary my-2;
+}
+
+/* Desktop: float to right margin (Tufte-style) */
+@media (min-width: 1280px) {
+  aside.sidenote {
+    @apply float-right clear-right mt-0 -mr-64 mb-4 w-56 border-l-0 pl-0 text-base;
+  }
+
+  aside.sidenote p {
+    @apply my-0;
+  }
+}

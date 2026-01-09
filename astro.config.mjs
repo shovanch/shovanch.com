@@ -65,7 +65,10 @@ export default defineConfig({
   integrations: [
     // @ts-ignore
     expressiveCode(expressiveCodeConfig),
-    mdx(),
+    mdx({
+      remarkPlugins,
+      rehypePlugins,
+    }),
     react(),
     sitemap(),
     pagefind(),
