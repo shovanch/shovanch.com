@@ -229,7 +229,6 @@ a {
   display: inline-block;
   padding: 0.1rem 0.25rem;
   color: var(--theme-text);
-  transition: all 0.2s ease-in-out;
   /* text-decoration: none; */
 }
 
