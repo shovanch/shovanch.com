@@ -4,6 +4,8 @@
  */
 import { rehypeHeadingIds } from '@astrojs/markdown-remark';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
+import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
 
 // Custom plugins
 import { rehypeImageCaptions } from '../libs/rehype-image-captions';
@@ -39,7 +41,8 @@ export const rehypePlugins: any[] = [
 
 // ExpressiveCode configuration
 export const expressiveCodeConfig = {
-  themes: ['material-theme-darker'],
+  themes: ['night-owl'],
+  plugins: [pluginLineNumbers(), pluginCollapsibleSections()],
   styleOverrides: {
     codeFontFamily: 'var(--font-mono)',
     codeFontSize: '1rem',

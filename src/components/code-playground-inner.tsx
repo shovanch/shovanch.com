@@ -1,5 +1,5 @@
 import { Sandpack } from '@codesandbox/sandpack-react';
-import { amethyst } from '@codesandbox/sandpack-themes';
+import { nightOwl } from '@codesandbox/sandpack-themes';
 import type { SandboxEditorProps } from './code-playground';
 
 export default function CodePlaygroundInner({
@@ -21,10 +21,10 @@ export default function CodePlaygroundInner({
       files={files}
       options={editorProps}
       theme={{
-        ...amethyst,
+        ...nightOwl,
         font: {
-          body: 'Fira Code, monospace',
-          mono: 'Fira Code, monospace',
+          body: 'MonoLisa, monospace',
+          mono: 'MonoLisa, monospace',
           size: '14px',
         },
       }}
