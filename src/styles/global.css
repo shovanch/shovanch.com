@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './sandpack.css';
 @plugin '@tailwindcss/typography';
 
 /* Additional font weights - loaded lazily */
@@ -241,6 +242,19 @@ body {
   content: none !important;
 }
 
+/* ExpressiveCode responsive sizing - override CSS variables */
+.expressive-code {
+  --ec-codeFontSize: 0.8rem !important;
+  --ec-uiFontSize: 0.7rem !important;
+}
+
+@media (min-width: 640px) {
+  .expressive-code {
+    --ec-codeFontSize: 0.9rem !important;
+    --ec-uiFontSize: 0.8rem !important;
+  }
+}
+
 /* Text selection highlighting */
 ::selection {
   background-color: var(--theme-highlight);
@@ -297,6 +311,32 @@ input:focus:not(:focus-visible),
 textarea:focus:not(:focus-visible),
 select:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Sandpack - disable all focus outlines */
+.sandpack-wrapper *:focus,
+.sandpack-wrapper *:focus-visible,
+.sandpack-wrapper *:active,
+.sandpack-wrapper button:focus,
+.sandpack-wrapper button:focus-visible,
+.sandpack-wrapper button:active,
+.sandpack-wrapper [role='tab']:focus,
+.sandpack-wrapper [role='tab']:focus-visible,
+.sandpack-wrapper .sp-tab-container:focus,
+.sandpack-wrapper .sp-tab-container:focus-visible,
+.sandpack-wrapper .sp-tab-container:focus-within {
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Also target the dynamically generated Sandpack classes */
+.sandpack-wrapper [class*='sp-c-']:focus,
+.sandpack-wrapper [class*='sp-c-']:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* High contrast mode support */

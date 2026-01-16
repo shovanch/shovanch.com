@@ -77,7 +77,7 @@ const fragments = defineCollection({
 const notes = defineCollection({
   loader: glob({
     pattern: [
-      '**/*.md',
+      '**/*.{md,mdx}',
       '!**/Excalidraw/**',
       '!**/excalidraw/**',
       '!**/*.excalidraw.*',

@@ -9,24 +9,6 @@ import { formatDate } from '~/utils/format-date';
 
 const allPosts = await getCollection('posts');
 const posts = filterAndSortContent(allPosts);
-
-// Group posts by year
-const postsByYear = posts.reduce(
-  (acc, post) => {
-    const year = new Date(post.data.publishedAt).getFullYear();
-    if (!acc[year]) {
-      acc[year] = [];
-    }
-    acc[year].push(post);
-    return acc;
-  },
-  {} as Record<number, typeof posts>,
-);
-
-// Sort years descending (newest first)
-const sortedYears = Object.keys(postsByYear)
-  .map(Number)
-  .sort((a, b) => b - a);
 ---
 
 <!doctype html>
@@ -45,35 +27,26 @@ const sortedYears = Object.keys(postsByYear)
         <h1 class="text-theme-text font-sans text-4xl font-semibold">Posts</h1>
       </div>
 
-      <div class="flex flex-col gap-12">
+      <ul class="flex flex-col gap-3">
         {
-          sortedYears.map((year) => (
-            <section class="flex flex-col gap-4">
-              <h2 class="text-theme-text-secondary ml-1 font-sans text-base font-medium">
-                {year}
-              </h2>
-              <ul class="flex flex-col gap-3">
-                {postsByYear[year].map((post) => (
-                  <li class="flex items-start justify-between gap-3">
-                    <a
-                      href={`/posts/${post.id}`}
-                      class="text-theme-text hover:text-theme-text-secondary font-serif text-lg font-semibold transition-colors duration-200 md:text-xl"
-                    >
-                      {post.data.title}
-                    </a>
-                    <time
-                      datetime={post.data.publishedAt}
-                      class="text-theme-text-secondary shrink-0 font-sans text-base font-medium"
-                    >
-                      {formatDate(post.data.publishedAt)}
-                    </time>
-                  </li>
-                ))}
-              </ul>
-            </section>
+          posts.map((post) => (
+            <li class="flex items-start justify-between gap-3">
+              <a
+                href={`/posts/${post.id}`}
+                class="text-theme-text hover:text-theme-text-secondary font-serif text-lg font-semibold transition-colors duration-200 md:text-xl"
+              >
+                {post.data.title}
+              </a>
+              <time
+                datetime={post.data.publishedAt}
+                class="text-theme-text-secondary shrink-0 font-sans text-base font-medium"
+              >
+                {formatDate(post.data.publishedAt)}
+              </time>
+            </li>
           ))
         }
-      </div>
+      </ul>
     </main>
   </RootLayout>
 </html>

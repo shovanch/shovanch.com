@@ -55,8 +55,8 @@ export function computeSlug(
   if (frontmatter.slug && frontmatter.slug.trim()) {
     return normalizeSlug(frontmatter.slug);
   }
-  // Remove .md extension and normalize
-  const nameWithoutExt = filename.replace(/\.md$/i, '');
+  // Remove .md or .mdx extension and normalize
+  const nameWithoutExt = filename.replace(/\.mdx?$/i, '');
   return normalizeSlug(nameWithoutExt);
 }
 
@@ -74,9 +74,11 @@ export function computeCanonicalRoute(
   slug: string
 ): string {
   const dir = path.dirname(relativePath);
-  const filename = path.basename(relativePath, '.md');
+  // Handle both .md and .mdx extensions
+  const ext = path.extname(relativePath);
+  const filename = path.basename(relativePath, ext);
 
-  // Handle index.md → folder path (no /index segment)
+  // Handle index.md/index.mdx → folder path (no /index segment)
   if (filename.toLowerCase() === 'index') {
     if (dir === '.') {
       // index.md at root of notes/ - this would be /notes itself
@@ -170,8 +172,8 @@ function extractTitle(
   if (frontmatter.title && frontmatter.title.trim()) {
     return frontmatter.title.trim();
   }
-  // Use filename without extension as fallback
-  const nameWithoutExt = filename.replace(/\.md$/i, '');
+  // Use filename without extension as fallback (handles .md and .mdx)
+  const nameWithoutExt = filename.replace(/\.mdx?$/i, '');
   return nameWithoutExt || null;
 }
 
@@ -185,8 +187,8 @@ function generateId(
   if (frontmatter.id && frontmatter.id.trim()) {
     return frontmatter.id.trim();
   }
-  // Derive from filepath: remove .md, normalize
-  return normalizeSlug(relativePath.replace(/\.md$/i, ''));
+  // Derive from filepath: remove .md or .mdx, normalize
+  return normalizeSlug(relativePath.replace(/\.mdx?$/i, ''));
 }
 
 /**
@@ -200,8 +202,8 @@ export async function buildNoteManifest(
 ): Promise<NoteManifest> {
   const vaultPath = basePath || path.resolve(process.cwd(), VAULT_NOTES_PATH);
 
-  // Find all markdown files
-  const files = await glob('**/*.md', { cwd: vaultPath });
+  // Find all markdown files (both .md and .mdx)
+  const files = await glob('**/*.{md,mdx}', { cwd: vaultPath });
 
   const entries: NoteEntry[] = [];
   const errors: ManifestError[] = [];

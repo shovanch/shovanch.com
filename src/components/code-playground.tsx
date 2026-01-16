@@ -8,11 +8,21 @@ export type SandboxEditorProps = {
     | 'svelte'
     | 'test-ts'
     | 'vanilla-ts'
-    | 'nextjs';
+    | 'nextjs'
+    | 'node'
+    | 'vite'
+    | 'vite-react'
+    | 'vite-react-ts'
+    | 'vite-vue'
+    | 'vite-vue-ts'
+    | 'vite-svelte'
+    | 'vite-svelte-ts';
   customSetup?: Record<string, any>;
   className?: string;
   style?: React.CSSProperties;
-  editorProps?: Record<string, any>;
+  autorun?: boolean;
+  defaultTab?: 'preview' | 'console';
+  editorHeight?: number;
 };
 
 const LazyCodePlaygroundInner = lazy(() => import('./code-playground-inner'));

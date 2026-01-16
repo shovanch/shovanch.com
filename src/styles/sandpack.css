@@ -1,0 +1,344 @@
+/* Sandpack Code Playground Styles */
+
+/* Wrapper */
+.sandpack-wrapper {
+  --sp-colors-surface1: #0d1117;
+  --sp-colors-surface2: #161b22;
+  --sp-colors-surface3: #21262d;
+  --sp-colors-clickable: #7d8590;
+  --sp-colors-hover: #e6edf3;
+  --sp-colors-accent: #2f81f7;
+  --sp-border-radius: 0.5rem; /* Match ExpressiveCode border radius */
+}
+
+/* Layout */
+.sandpack-wrapper .sp-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--sp-colors-surface3) !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+  background: transparent;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 960px) {
+  .sandpack-wrapper .sp-layout {
+    flex-direction: row;
+  }
+}
+
+/* Editor Panel */
+.sandpack-wrapper .sp-editor {
+  flex: 1;
+  min-width: 0;
+  border-radius: 0 !important;
+}
+
+/* On mobile, ensure editor has explicit height and doesn't collapse */
+@media (max-width: 959px) {
+  .sandpack-wrapper .sp-editor {
+    flex: none !important;
+    height: 300px !important;
+    min-height: 300px !important;
+  }
+
+  .preview-panel {
+    flex: none !important;
+    height: 350px !important;
+    min-height: 350px !important;
+  }
+}
+
+/* First child in layout gets top-left corner rounded */
+.sandpack-wrapper .sp-layout > *:first-child {
+  border-top-left-radius: 0.5rem !important;
+}
+
+/* Last child in layout gets bottom-right corner rounded */
+.sandpack-wrapper .sp-layout > *:last-child {
+  border-bottom-right-radius: 0.5rem !important;
+}
+
+/* On desktop (side-by-side), adjust corner radius */
+@media (min-width: 960px) {
+  .sandpack-wrapper .sp-layout > *:first-child {
+    border-top-left-radius: 0.5rem !important;
+    border-bottom-left-radius: 0.5rem !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  .sandpack-wrapper .sp-layout > *:last-child {
+    border-top-right-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+}
+
+/* On mobile (stacked), adjust corner radius */
+@media (max-width: 959px) {
+  .sandpack-wrapper .sp-layout > *:first-child {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  .sandpack-wrapper .sp-layout > *:last-child {
+    border-bottom-left-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .sandpack-wrapper .sp-editor {
+    border-right: 1px solid var(--sp-colors-surface3);
+  }
+}
+
+@media (max-width: 959px) {
+  .sandpack-wrapper .sp-editor {
+    border-bottom: 1px solid var(--sp-colors-surface3);
+  }
+}
+
+/* Tab Styling */
+.sandpack-wrapper .sp-tabs {
+  background: var(--sp-colors-surface1);
+  border-bottom: 1px solid var(--sp-colors-surface3);
+  padding: 0 4px;
+}
+
+.sandpack-wrapper .sp-tabs-scrollable-container {
+  padding: 0;
+}
+
+.sandpack-wrapper .sp-tab-button {
+  position: relative;
+  padding: 8px 12px;
+  margin-top: 4px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  font-size: 13px;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.sandpack-wrapper .sp-tab-button[data-active='true'] {
+  background: var(--sp-colors-surface2);
+  border-color: var(--sp-colors-surface3);
+  margin-bottom: -1px;
+  padding-bottom: 9px;
+}
+
+/* Curved corner effect for active tabs */
+.sandpack-wrapper .sp-tab-button[data-active='true']::before,
+.sandpack-wrapper .sp-tab-button[data-active='true']::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+}
+
+.sandpack-wrapper .sp-tab-button[data-active='true']::before {
+  left: -9px;
+  background:
+    radial-gradient(
+      circle at top left,
+      transparent 8px,
+      var(--sp-colors-surface3) 8px,
+      var(--sp-colors-surface3) 9px,
+      transparent 9px
+    ),
+    radial-gradient(circle at top left, transparent 7px, var(--sp-colors-surface2) 7px);
+}
+
+.sandpack-wrapper .sp-tab-button[data-active='true']::after {
+  right: -9px;
+  background:
+    radial-gradient(
+      circle at top right,
+      transparent 8px,
+      var(--sp-colors-surface3) 8px,
+      var(--sp-colors-surface3) 9px,
+      transparent 9px
+    ),
+    radial-gradient(circle at top right, transparent 7px, var(--sp-colors-surface2) 7px);
+}
+
+/* Preview Panel */
+.preview-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--sp-colors-surface2);
+  position: relative;
+}
+
+/* Preview Tabs Header */
+.preview-tabs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  background: var(--sp-colors-surface1);
+  border-bottom: 1px solid var(--sp-colors-surface3);
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.preview-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.preview-tabs button {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: var(--sp-colors-clickable);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.preview-tabs button:hover {
+  background: var(--sp-colors-surface3);
+  color: var(--sp-colors-hover);
+}
+
+.preview-tabs button.active {
+  background: var(--sp-colors-surface3);
+  color: var(--sp-colors-accent);
+}
+
+.preview-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.preview-actions button,
+.preview-actions .preview-action-button {
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: var(--sp-colors-clickable);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.preview-actions button:hover,
+.preview-actions .preview-action-button:hover {
+  background: var(--sp-colors-surface3);
+  color: var(--sp-colors-hover);
+}
+
+/* Run Button Overlay */
+.run-button-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.run-button-overlay > * {
+  pointer-events: auto;
+}
+
+.custom-run-button {
+  padding: 12px 24px;
+  background: var(--sp-colors-accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: filter 0.15s;
+}
+
+.custom-run-button:hover {
+  filter: brightness(1.1);
+}
+
+/* Fullscreen Mode */
+.sandpack-wrapper.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  background: var(--sp-colors-surface1);
+}
+
+.sandpack-wrapper.fullscreen .sp-layout {
+  height: 100dvh;
+  border-radius: 0;
+  border: none;
+}
+
+/* Code Mirror Customizations */
+.sandpack-wrapper .cm-scroller {
+  padding: 8px 0 !important;
+}
+
+.sandpack-wrapper .cm-gutterElement {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+/* Hide default Sandpack console header and actions */
+.sandpack-wrapper .sp-console .sp-console-header {
+  display: none;
+}
+
+/* Preview container background */
+.sandpack-wrapper .sp-preview-container {
+  background: var(--sp-colors-surface2);
+}
+
+.sandpack-wrapper .sp-preview-iframe {
+  background: var(--sp-colors-surface2);
+}
+
+/* Console styling */
+.sandpack-wrapper .sp-console {
+  background: var(--sp-colors-surface2);
+}
+
+/* Stack styling */
+.sandpack-wrapper .sp-stack {
+  background: var(--sp-colors-surface2);
+}
+
