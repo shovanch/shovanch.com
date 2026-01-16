@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '~/layouts/base-layout.astro';
-import { DynamicTOC } from '~/components/dynamic-toc';
+import DynamicTOC from '~/components/dynamic-toc.astro';
 import RelatedPosts from '~/components/related-posts.astro';
 import type { Post } from '~/content.config';
 
@@ -41,7 +41,7 @@ const {
   <Fragment slot="toc">
     {
       showToc && headings && headings.length > 0 && (
-        <DynamicTOC headings={headings} readingTime={readingTime} client:idle />
+        <DynamicTOC headings={headings} readingTime={readingTime} />
       )
     }
   </Fragment>

@@ -1,0 +1,539 @@
+---
+import type { TocHeading } from '~/utils/toc';
+
+interface Props {
+  headings: TocHeading[];
+  readingTime?: string | number;
+}
+
+const { headings } = Astro.props;
+
+// Only show TOC if article has 3+ headings
+const shouldShowTOC = headings.length >= 3;
+
+// Helper to render nested headings
+function renderHeading(heading: TocHeading, level: number = 0): string {
+  const childrenHtml = heading.children?.length
+    ? `<ul class="mt-1">${heading.children.map(child => renderHeading(child, level + 1)).join('')}</ul>`
+    : '';
+
+  return `
+    <li class="relative toc-level-${level}" data-toc-item data-slug="${heading.slug}">
+      <div class="relative">
+        <div class="toc-indicator absolute top-0 left-0 w-0.5 h-full bg-theme-border opacity-40 transition-all duration-300 ease-out"></div>
+        <button
+          data-toc-link="${heading.slug}"
+          class="toc-link group block w-full rounded-r-md py-1 pr-2 pl-4 text-left text-sm transition-all duration-200 hover:bg-blue-50/50 hover:text-blue-600 dark:hover:bg-blue-950/30 dark:hover:text-blue-400 text-theme-text-secondary ${level > 0 ? 'ml-4' : ''}"
+          aria-label="Go to section: ${heading.text}"
+        >
+          <span class="inline-block transition-transform duration-200 group-hover:translate-x-1">${heading.text}</span>
+        </button>
+      </div>
+      ${childrenHtml}
+    </li>
+  `;
+}
+---
+
+{shouldShowTOC && (
+  <>
+    {/* Pass headings data to JS */}
+    <script type="application/json" id="toc-headings-data" set:html={JSON.stringify(headings)} />
+
+    {/* Desktop TOC */}
+    <nav
+      data-toc-desktop
+      class="fixed bottom-6 left-6 z-10 max-w-64 transition-all duration-500 ease-out -translate-x-4 opacity-0 hidden xl:block"
+      aria-label="Table of contents"
+      role="navigation"
+    >
+      <div class="max-h-[70vh] w-full overflow-x-hidden overflow-y-auto p-4">
+        <div class="mb-3 -ml-1.5 flex items-center gap-2">
+          {/* Circular progress indicator */}
+          <div class="relative h-4 w-4">
+            <svg class="h-full w-full -rotate-90 transform" viewBox="0 0 32 32">
+              <circle
+                cx="16"
+                cy="16"
+                r="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                class="text-theme-border"
+              />
+              <circle
+                data-toc-progress-circle
+                cx="16"
+                cy="16"
+                r="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="5"
+                stroke-linecap="round"
+                class="text-blue-500 transition-all duration-300"
+                style={`stroke-dasharray: ${2 * Math.PI * 14}; stroke-dashoffset: ${2 * Math.PI * 14};`}
+              />
+            </svg>
+          </div>
+          <h3 class="text-theme-text text-sm font-semibold">On this page</h3>
+        </div>
+        <ul class="space-y-1" data-toc-list set:html={headings.map(h => renderHeading(h)).join('')} />
+      </div>
+    </nav>
+
+    {/* Mobile TOC */}
+    <div class="xl:hidden">
+      {/* Mobile TOC Toggle Button */}
+      <button
+        data-toc-mobile-button
+        class="bg-theme-text text-theme-bg fixed right-5 bottom-5 z-50 flex h-10 w-10 items-center justify-center rounded-full shadow-md opacity-75 transition-opacity duration-300 hover:opacity-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+        aria-label="Open table of contents"
+        aria-expanded="false"
+        aria-controls="mobile-toc-panel"
+      >
+        <svg
+          data-toc-mobile-icon
+          class="h-5 w-5 transition-transform duration-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 6h13M8 12h13M8 18h13"
+          />
+          <circle cx="4" cy="6.5" r="1" fill="currentColor" />
+          <circle cx="4" cy="12" r="1" fill="currentColor" />
+          <circle cx="4" cy="18" r="1" fill="currentColor" />
+        </svg>
+      </button>
+
+      {/* Mobile TOC Panel */}
+      <div
+        data-toc-mobile-panel
+        class="fixed inset-0 z-40 flex items-end justify-center transition-all duration-300 ease-out invisible opacity-0"
+      >
+        {/* Backdrop */}
+        <div
+          data-toc-backdrop
+          class="absolute inset-0 bg-black transition-opacity duration-300 ease-out opacity-0"
+        />
+
+        {/* TOC Panel */}
+        <div
+          id="mobile-toc-panel"
+          class="bg-theme-bg relative w-full max-w-sm transform rounded-t-lg p-6 shadow-xl transition-transform duration-300 ease-out translate-y-full"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Table of contents"
+        >
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-theme-text text-lg font-semibold">On this page</h3>
+          </div>
+          <div class="max-h-[60vh] overflow-y-auto">
+            <ul class="space-y-2" data-toc-mobile-list>
+              {headings.map((heading) => (
+                <li>
+                  <button
+                    data-toc-mobile-link={heading.slug}
+                    class="toc-mobile-link block w-full rounded px-3 py-2 text-left text-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none text-theme-text-secondary hover:bg-theme-surface"
+                    aria-label={`Go to section: ${heading.text}`}
+                  >
+                    {heading.text}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>
+)}
+
+<script>
+  function initDynamicTOC() {
+    // Get headings data
+    const headingsDataEl = document.getElementById('toc-headings-data');
+    if (!headingsDataEl) return;
+
+    const headings: Array<{ slug: string; text: string; depth: number; children?: Array<{ slug: string; text: string }> }> = JSON.parse(headingsDataEl.textContent || '[]');
+    if (headings.length < 3) return;
+
+    // Flatten headings for keyboard navigation
+    function flattenHeadings(items: typeof headings): Array<{ slug: string; text: string }> {
+      const result: Array<{ slug: string; text: string }> = [];
+      for (const item of items) {
+        result.push({ slug: item.slug, text: item.text });
+        if (item.children) {
+          result.push(...flattenHeadings(item.children as typeof headings));
+        }
+      }
+      return result;
+    }
+    const flatHeadings = flattenHeadings(headings);
+
+    // State
+    let activeHeading = '';
+    let isVisible = false;
+    let isMobileOpen = false;
+    let scrollProgress = 0;
+    let lastScrollY = 0;
+    let isScrollingDown = false;
+    let selectedHeadingIndex = 0;
+    let isNearBottom = false;
+    let shouldHideTOC = false;
+    let hasScrolledPast10Percent = false;
+    let hideTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    let showTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    // DOM references
+    const desktopNav = document.querySelector('[data-toc-desktop]') as HTMLElement | null;
+    const progressCircle = document.querySelector('[data-toc-progress-circle]') as SVGCircleElement | null;
+    const mobileButton = document.querySelector('[data-toc-mobile-button]') as HTMLButtonElement | null;
+    const mobilePanel = document.querySelector('[data-toc-mobile-panel]') as HTMLElement | null;
+    const backdrop = document.querySelector('[data-toc-backdrop]') as HTMLElement | null;
+    const mobilePanelContent = document.getElementById('mobile-toc-panel') as HTMLElement | null;
+    const mobileIcon = document.querySelector('[data-toc-mobile-icon]') as SVGElement | null;
+
+    if (!desktopNav || !mobileButton || !mobilePanel) return;
+
+    const circumference = 2 * Math.PI * 14;
+
+    // Update functions
+    function updateDesktopVisibility() {
+      if (!desktopNav) return;
+      if (isVisible && !isNearBottom) {
+        desktopNav.classList.remove('-translate-x-4', 'opacity-0');
+        desktopNav.classList.add('translate-x-0', 'opacity-100');
+      } else {
+        desktopNav.classList.add('-translate-x-4', 'opacity-0');
+        desktopNav.classList.remove('translate-x-0', 'opacity-100');
+      }
+    }
+
+    function updateProgress() {
+      if (!progressCircle) return;
+      const offset = circumference * (1 - scrollProgress / 100);
+      progressCircle.style.strokeDashoffset = String(offset);
+    }
+
+    function updateActiveHeading(slug: string) {
+      // Update desktop TOC
+      document.querySelectorAll('[data-toc-link]').forEach((link) => {
+        const linkSlug = link.getAttribute('data-toc-link');
+        const indicator = link.closest('[data-toc-item]')?.querySelector('.toc-indicator') as HTMLElement | null;
+
+        if (linkSlug === slug) {
+          link.classList.add('bg-blue-50/70', 'font-medium', 'text-blue-600', 'dark:bg-blue-950/50', 'dark:text-blue-400');
+          link.classList.remove('text-theme-text-secondary');
+          link.setAttribute('aria-current', 'location');
+          if (indicator) {
+            indicator.classList.add('bg-blue-500', 'opacity-100');
+            indicator.classList.remove('bg-theme-border', 'opacity-40');
+          }
+        } else {
+          link.classList.remove('bg-blue-50/70', 'font-medium', 'text-blue-600', 'dark:bg-blue-950/50', 'dark:text-blue-400');
+          link.classList.add('text-theme-text-secondary');
+          link.removeAttribute('aria-current');
+          if (indicator) {
+            indicator.classList.remove('bg-blue-500', 'opacity-100');
+            indicator.classList.add('bg-theme-border', 'opacity-40');
+          }
+        }
+      });
+
+      // Update mobile TOC
+      document.querySelectorAll('[data-toc-mobile-link]').forEach((link) => {
+        const linkSlug = link.getAttribute('data-toc-mobile-link');
+        if (linkSlug === slug) {
+          link.classList.add('bg-blue-100', 'text-blue-700', 'dark:bg-blue-900', 'dark:text-blue-300');
+          link.classList.remove('text-theme-text-secondary', 'hover:bg-theme-surface');
+          link.setAttribute('aria-current', 'location');
+        } else {
+          link.classList.remove('bg-blue-100', 'text-blue-700', 'dark:bg-blue-900', 'dark:text-blue-300');
+          link.classList.add('text-theme-text-secondary', 'hover:bg-theme-surface');
+          link.removeAttribute('aria-current');
+        }
+      });
+
+      activeHeading = slug;
+    }
+
+    function updateMobileButtonVisibility() {
+      // No-op: keeping button always visible without distracting animations
+    }
+
+    function openMobilePanel() {
+      if (!mobilePanel || !backdrop || !mobilePanelContent || !mobileButton || !mobileIcon) return;
+      isMobileOpen = true;
+
+      // Update panel
+      mobilePanel.classList.remove('invisible', 'opacity-0');
+      mobilePanel.classList.add('visible', 'opacity-100');
+
+      // Update backdrop
+      backdrop.classList.remove('opacity-0');
+      backdrop.classList.add('opacity-50');
+
+      // Update panel content
+      mobilePanelContent.classList.remove('translate-y-full');
+      mobilePanelContent.classList.add('translate-y-0');
+
+      // Update button
+      mobileButton.setAttribute('aria-expanded', 'true');
+      mobileButton.setAttribute('aria-label', 'Close table of contents');
+
+      // Update icon to X
+      mobileIcon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      `;
+
+      // Lock body scroll
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobilePanel() {
+      if (!mobilePanel || !backdrop || !mobilePanelContent || !mobileButton || !mobileIcon) return;
+      isMobileOpen = false;
+
+      // Update panel
+      mobilePanel.classList.add('invisible', 'opacity-0');
+      mobilePanel.classList.remove('visible', 'opacity-100');
+
+      // Update backdrop
+      backdrop.classList.add('opacity-0');
+      backdrop.classList.remove('opacity-50');
+
+      // Update panel content
+      mobilePanelContent.classList.add('translate-y-full');
+      mobilePanelContent.classList.remove('translate-y-0');
+
+      // Update button
+      mobileButton.setAttribute('aria-expanded', 'false');
+      mobileButton.setAttribute('aria-label', 'Open table of contents');
+
+      // Update icon to list
+      mobileIcon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13" />
+        <circle cx="4" cy="6.5" r="1" fill="currentColor" />
+        <circle cx="4" cy="12" r="1" fill="currentColor" />
+        <circle cx="4" cy="18" r="1" fill="currentColor" />
+      `;
+
+      // Restore body scroll
+      document.body.style.overflow = '';
+    }
+
+    function handleHeadingClick(slug: string) {
+      const element = document.getElementById(slug);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Scroll handler
+    function calculateProgress() {
+      const scrollTop = document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const pageProgress = Math.min((scrollTop / scrollHeight) * 100, 100);
+      scrollProgress = pageProgress;
+      updateProgress();
+
+      // Check if near bottom
+      isNearBottom = pageProgress > 90;
+      updateDesktopVisibility();
+
+      // Check if scrolled past 10% of viewport
+      const viewportHeight = window.innerHeight;
+      const scrolledPast10Percent = scrollTop > viewportHeight * 0.1;
+      if (!hasScrolledPast10Percent && scrolledPast10Percent) {
+        hasScrolledPast10Percent = true;
+      }
+
+      // Detect scroll direction
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollY;
+      const scrollingUp = currentScrollY < lastScrollY;
+
+      // Auto-hide logic
+      if (hasScrolledPast10Percent || scrolledPast10Percent) {
+        if (scrollingUp && shouldHideTOC) {
+          if (hideTimeoutId) {
+            clearTimeout(hideTimeoutId);
+            hideTimeoutId = null;
+          }
+          if (showTimeoutId) {
+            clearTimeout(showTimeoutId);
+          }
+          showTimeoutId = setTimeout(() => {
+            shouldHideTOC = false;
+            updateMobileButtonVisibility();
+            showTimeoutId = null;
+          }, 300);
+        } else if (scrollingDown && !shouldHideTOC) {
+          if (showTimeoutId) {
+            clearTimeout(showTimeoutId);
+            showTimeoutId = null;
+          }
+          if (hideTimeoutId) {
+            clearTimeout(hideTimeoutId);
+          }
+          hideTimeoutId = setTimeout(() => {
+            shouldHideTOC = true;
+            updateMobileButtonVisibility();
+            hideTimeoutId = null;
+          }, 5000);
+        }
+      }
+
+      if (scrollingDown !== isScrollingDown && (scrollingDown || scrollingUp)) {
+        isScrollingDown = scrollingDown;
+      }
+      lastScrollY = currentScrollY;
+
+      // Find active heading
+      let activeId = '';
+      let activeIndex = 0;
+      for (let i = 0; i < flatHeadings.length; i++) {
+        const element = document.getElementById(flatHeadings[i].slug);
+        if (!element) continue;
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight * 0.3) {
+          activeId = element.id;
+          activeIndex = i;
+        }
+      }
+
+      if (activeId && activeId !== activeHeading) {
+        updateActiveHeading(activeId);
+        selectedHeadingIndex = activeIndex;
+      }
+    }
+
+    function handleScroll() {
+      requestAnimationFrame(calculateProgress);
+    }
+
+    // Keyboard handler
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!isVisible || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          if (selectedHeadingIndex > 0) {
+            selectedHeadingIndex--;
+            const heading = flatHeadings[selectedHeadingIndex];
+            if (heading) {
+              handleHeadingClick(heading.slug);
+            }
+          }
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          if (selectedHeadingIndex < flatHeadings.length - 1) {
+            selectedHeadingIndex++;
+            const heading = flatHeadings[selectedHeadingIndex];
+            if (heading) {
+              handleHeadingClick(heading.slug);
+            }
+          }
+          break;
+        case 'Enter':
+          event.preventDefault();
+          const currentHeading = flatHeadings[selectedHeadingIndex];
+          if (currentHeading) {
+            handleHeadingClick(currentHeading.slug);
+          }
+          break;
+        case 'Escape':
+          event.preventDefault();
+          if (isMobileOpen) {
+            closeMobilePanel();
+          }
+          break;
+      }
+    }
+
+    // Click handlers
+    function handleDesktopLinkClick(e: Event) {
+      const target = e.target as HTMLElement;
+      const button = target.closest('[data-toc-link]') as HTMLElement | null;
+      if (button) {
+        const slug = button.getAttribute('data-toc-link');
+        if (slug) {
+          handleHeadingClick(slug);
+        }
+      }
+    }
+
+    function handleMobileLinkClick(e: Event) {
+      const target = e.target as HTMLElement;
+      const button = target.closest('[data-toc-mobile-link]') as HTMLElement | null;
+      if (button) {
+        const slug = button.getAttribute('data-toc-mobile-link');
+        if (slug) {
+          handleHeadingClick(slug);
+          closeMobilePanel();
+        }
+      }
+    }
+
+    function handleMobileButtonClick() {
+      if (isMobileOpen) {
+        closeMobilePanel();
+      } else {
+        openMobilePanel();
+      }
+    }
+
+    function handleBackdropClick() {
+      closeMobilePanel();
+    }
+
+    // Initialize
+    setTimeout(() => {
+      isVisible = true;
+      updateDesktopVisibility();
+    }, 500);
+
+    calculateProgress();
+
+    // Event listeners
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', calculateProgress);
+    window.addEventListener('keydown', handleKeyDown);
+    desktopNav.addEventListener('click', handleDesktopLinkClick);
+    mobileButton.addEventListener('click', handleMobileButtonClick);
+    backdrop?.addEventListener('click', handleBackdropClick);
+    document.querySelector('[data-toc-mobile-list]')?.addEventListener('click', handleMobileLinkClick);
+
+    // Cleanup
+    function cleanup() {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', calculateProgress);
+      window.removeEventListener('keydown', handleKeyDown);
+      desktopNav?.removeEventListener('click', handleDesktopLinkClick);
+      mobileButton?.removeEventListener('click', handleMobileButtonClick);
+      backdrop?.removeEventListener('click', handleBackdropClick);
+      document.querySelector('[data-toc-mobile-list]')?.removeEventListener('click', handleMobileLinkClick);
+
+      if (hideTimeoutId) clearTimeout(hideTimeoutId);
+      if (showTimeoutId) clearTimeout(showTimeoutId);
+
+      // Restore body scroll if mobile was open
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('astro:before-swap', cleanup, { once: true });
+  }
+
+  // Initialize
+  initDynamicTOC();
+  document.addEventListener('astro:after-swap', initDynamicTOC);
+</script>

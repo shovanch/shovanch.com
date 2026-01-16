@@ -154,6 +154,44 @@ const canonicalUrl = new URL(
 const title =
   collectionEntry.data.title || entry.title || extractTitleFromId(collectionEntry.id);
 
+// Generate summary from first paragraph of content (for meta description)
+const generateSummary = (body: string | undefined, maxLength = 160): string => {
+  if (!body) return '';
+
+  // Remove frontmatter if present
+  const contentWithoutFrontmatter = body.replace(/^---[\s\S]*?---\n*/, '');
+
+  // Remove markdown formatting
+  const plainText = contentWithoutFrontmatter
+    .replace(/^#+\s+.+$/gm, '') // Remove headings
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
+    .replace(/[*_`~]/g, '') // Remove emphasis markers
+    .replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
+    .replace(/\n+/g, ' ') // Convert newlines to spaces
+    .trim();
+
+  // Get first meaningful sentence(s) up to maxLength
+  if (plainText.length <= maxLength) return plainText;
+
+  // Try to cut at sentence boundary
+  const truncated = plainText.substring(0, maxLength);
+  const lastSentenceEnd = Math.max(
+    truncated.lastIndexOf('. '),
+    truncated.lastIndexOf('! '),
+    truncated.lastIndexOf('? ')
+  );
+
+  if (lastSentenceEnd > maxLength * 0.5) {
+    return truncated.substring(0, lastSentenceEnd + 1);
+  }
+
+  // Fall back to word boundary
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
+};
+
+const summary = collectionEntry.data.summary || generateSummary(collectionEntry.body);
+
 // Convert coverImage path to web-accessible format
 const getCoverImageSrc = (coverImage: string) => {
   const wikilinkMatch = coverImage.match(/\[([^\]]+)\]\(([^)]+)\)/);
@@ -173,7 +211,7 @@ const getCoverImageSrc = (coverImage: string) => {
 
 <NoteLayout
   title={title}
-  summary=""
+  summary={summary}
   publishedAt={publishedAt}
   slug={entry.slug}
   tags={collectionEntry.data.tags || []}

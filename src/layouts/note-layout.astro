@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '~/layouts/base-layout.astro';
-import { DynamicTOC } from '~/components/dynamic-toc';
+import DynamicTOC from '~/components/dynamic-toc.astro';
 import { UI_CONSTANTS } from '~/constants/ui-constants';
 import type { TocHeading } from '~/utils/toc';
 
@@ -44,11 +44,7 @@ const defaultReadingTime = readingTime || '1 min read';
   <Fragment slot="toc">
     {
       showToc && headings && headings.length > 0 && (
-        <DynamicTOC
-          headings={headings}
-          readingTime={defaultReadingTime}
-          client:load
-        />
+        <DynamicTOC headings={headings} readingTime={defaultReadingTime} />
       )
     }
   </Fragment>
