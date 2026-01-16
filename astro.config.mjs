@@ -54,6 +54,7 @@ export default defineConfig({
     platformProxy: {
       enabled: true,
     },
+    imageService: 'compile', // Use sharp at build time for image optimization
   }),
 
   markdown: {
