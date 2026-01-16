@@ -43,7 +43,7 @@ export const defaultMeta: SiteMeta = {
   url: siteConfig.url,
   title: siteConfig.title,
   description: siteConfig.description,
-  ogImage: `${siteConfig.url}/og`,
+  ogImage: `${siteConfig.url}/og.png`,
 };
 
 // Navigation configuration

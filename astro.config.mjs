@@ -2,7 +2,7 @@
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import vercel from '@astrojs/vercel';
+import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
 import pagefind from 'astro-pagefind';
@@ -50,9 +50,9 @@ export default defineConfig({
       },
     },
   },
-  adapter: vercel({
-    webAnalytics: {
-      enabled: false,
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
     },
   }),
 

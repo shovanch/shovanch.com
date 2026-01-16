@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Redirect old OG image URL to new one
+/og /og.png 301

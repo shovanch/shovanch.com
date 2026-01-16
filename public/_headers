@@ -1,0 +1,17 @@
+# Cloudflare Pages headers configuration
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Cache fonts for 1 year (immutable)
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache Astro built assets for 1 year (immutable)
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache OG images for 1 day (allows updates to propagate)
+/og.png
+  Cache-Control: public, max-age=86400
+
+/posts/*/og.png
+  Cache-Control: public, max-age=86400
