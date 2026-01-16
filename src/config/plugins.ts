@@ -11,11 +11,13 @@ import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-s
 import { rehypeImageCaptions } from '../libs/rehype-image-captions';
 import { rehypeRawHtmlInCode } from '../libs/rehype-raw-html-in-code';
 import { rehypeToc } from '../libs/rehype-toc';
+import { remarkCallouts } from '../libs/remark-callouts';
 import { remarkSidenotes } from '../libs/remark-sidenotes';
 import { remarkWikilinksSimple } from '../libs/remark-wikilinks-simple.js';
 
 // Plugin configurations
-export const remarkPlugins = [remarkWikilinksSimple, remarkSidenotes];
+// Note: remarkCallouts must come before remarkSidenotes to process callouts first
+export const remarkPlugins = [remarkWikilinksSimple, remarkCallouts, remarkSidenotes];
 
 export const rehypePlugins: any[] = [
   rehypeToc,
