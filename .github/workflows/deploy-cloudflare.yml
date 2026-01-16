@@ -57,7 +57,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=shovanch-com --branch=${{ github.head_ref || github.ref_name }} --compatibility-date="2025-08-15" --compatibility-flag=nodejs_compat_v2
+          command: pages deploy dist --project-name=shovanch-com --branch=${{ github.head_ref || github.ref_name }}
 
       - name: Comment PR with preview URL
         if: github.event_name == 'pull_request'
