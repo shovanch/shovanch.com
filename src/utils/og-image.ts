@@ -11,8 +11,8 @@ type OgImageOptions = {
 // Track initialization state
 let wasmInitialized = false;
 let fontsLoaded = false;
-let UncutSansMedium: Buffer;
-let UncutSansSemibold: Buffer;
+let StandardBook: Buffer;
+let StandardBold: Buffer;
 
 async function ensureWasmInitialized() {
   if (wasmInitialized) return;
@@ -30,11 +30,11 @@ async function ensureWasmInitialized() {
 function loadFonts() {
   if (fontsLoaded) return;
 
-  UncutSansMedium = fs.readFileSync(
-    path.resolve(process.cwd(), 'public/fonts/UncutSans-Medium.otf'),
+  StandardBook = fs.readFileSync(
+    path.resolve(process.cwd(), 'public/fonts/standard-book.otf'),
   );
-  UncutSansSemibold = fs.readFileSync(
-    path.resolve(process.cwd(), 'public/fonts/UncutSans-Semibold.otf'),
+  StandardBold = fs.readFileSync(
+    path.resolve(process.cwd(), 'public/fonts/standard-bold.otf'),
   );
   fontsLoaded = true;
 }
@@ -65,7 +65,7 @@ export async function generateOgImage({
                   props: {
                     style: {
                       fontSize: '96px',
-                      fontFamily: 'Uncut Sans Semibold',
+                      fontFamily: 'Standard Bold',
                     },
                     children: title,
                   },
@@ -76,7 +76,7 @@ export async function generateOgImage({
                       props: {
                         style: {
                           fontSize: '32px',
-                          fontFamily: 'Uncut Sans Medium',
+                          fontFamily: 'Standard Book',
                         },
                         children: description,
                       },
@@ -102,7 +102,7 @@ export async function generateOgImage({
                     style: {
                       color: '#2563eb',
                       fontSize: '30px',
-                      fontFamily: 'Uncut Sans Medium',
+                      fontFamily: 'Standard Book',
                     },
                     children: 'Shovan Chatterjee',
                   },
@@ -139,7 +139,7 @@ export async function generateOgImage({
           position: 'relative',
           padding: '0 88px',
           background: '#f7f8e8',
-          fontFamily: 'Uncut Sans Medium',
+          fontFamily: 'Standard Book',
         },
       },
     },
@@ -148,13 +148,13 @@ export async function generateOgImage({
       height: 600,
       fonts: [
         {
-          name: 'Uncut Sans Medium',
-          data: UncutSansMedium,
+          name: 'Standard Book',
+          data: StandardBook,
           style: 'normal',
         },
         {
-          name: 'Uncut Sans Semibold',
-          data: UncutSansSemibold,
+          name: 'Standard Bold',
+          data: StandardBold,
           style: 'normal',
         },
       ],

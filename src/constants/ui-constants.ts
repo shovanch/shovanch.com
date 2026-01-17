@@ -22,6 +22,6 @@ export const UI_CONSTANTS = {
   // Prose styling for content
   PROSE: {
     default:
-      'prose prose-lg md:prose-xl prose-headings:text-lg md:prose-headings:text-2xl prose-headings:font-sans prose-headings:text-semibold prose-headings:scroll-mt-8 prose-a:!decoration-dashed prose-h2:mt-10 prose-h2:md:mt-14 prose-a:!underline prose-a:!underline-offset-4 prose-img:rounded-md prose-img:w-full prose-strong:text-theme-text prose-hr:border-theme-text-secondary/40 prose-img:shadow-md max-w-none text-pretty prose-li:marker:text-theme-text-secondary',
+      'prose prose-lg md:prose-xl prose-headings:text-lg md:prose-headings:text-xl prose-headings:font-sans prose-headings:text-semibold prose-headings:scroll-mt-8 prose-a:!decoration-dashed prose-h2:mt-10 prose-h2:md:mt-14 prose-a:!underline prose-a:!underline-offset-4 prose-img:rounded-md prose-img:w-full prose-strong:text-theme-text prose-hr:border-theme-text-secondary/40 prose-img:shadow-md max-w-none text-pretty prose-li:marker:text-theme-text-secondary',
   },
 } as const;

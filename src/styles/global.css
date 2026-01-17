@@ -2,6 +2,23 @@
 @import './sandpack.css';
 @plugin '@tailwindcss/typography';
 
+/* Standard Font */
+@font-face {
+  font-family: 'Standard';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/standard-book-webfont.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Standard';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/standard-bold-webfont.woff2') format('woff2');
+}
+
 /* Additional font weights - loaded lazily */
 @font-face {
   font-family: 'Source Serif 4';
@@ -94,7 +111,7 @@ pre,
 
 @theme {
   --font-sans:
-    'UncutSans-Variable', ui-sans-serif, system-ui, sans-serif,
+    'Standard', ui-sans-serif, system-ui, sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-mono:
     'MonoLisa', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,

@@ -28,14 +28,21 @@ const canonicalURL = canonical
 <!-- Critical font preloads - only load essential fonts initially -->
 <link
   rel="preload"
-  href="/fonts/UncutSans-Variable.woff2"
+  href="/fonts/source-serif-4-latin-400-normal.woff2"
   as="font"
   type="font/woff2"
   crossorigin
 />
 <link
   rel="preload"
-  href="/fonts/source-serif-4-latin-400-normal.woff2"
+  href="/fonts/standard-book-webfont.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+<link
+  rel="preload"
+  href="/fonts/standard-bold-webfont.woff2"
   as="font"
   type="font/woff2"
   crossorigin
@@ -72,10 +79,23 @@ const canonicalURL = canonical
 <style>
   /* Ensure fonts are displayed quickly with fallbacks */
   @font-face {
-    font-family: 'UncutSans-Variable';
-    font-weight: 400 700;
+    font-family: 'Standard';
+    font-style: normal;
+    font-weight: 400;
     font-display: swap;
-    src: url('/fonts/UncutSans-Variable.woff2') format('woff2');
+    src: url('/fonts/standard-book-webfont.woff2') format('woff2');
+    unicode-range:
+      U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+      U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+      U+FEFF, U+FFFD;
+  }
+
+  @font-face {
+    font-family: 'Standard';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/standard-bold-webfont.woff2') format('woff2');
     unicode-range:
       U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
       U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
@@ -181,14 +201,14 @@ const canonicalURL = canonical
 
 <!-- Speculation Rules API for instant page navigation (Chrome/Edge) -->
 <script type="speculationrules">
-{
-  "prerender": [
-    {
-      "where": { "href_matches": "/*" },
-      "eagerness": "moderate"
-    }
-  ]
-}
+  {
+    "prerender": [
+      {
+        "where": { "href_matches": "/*" },
+        "eagerness": "moderate"
+      }
+    ]
+  }
 </script>
 
 <script
