@@ -36,7 +36,7 @@ export const siteConfig = {
   title: 'Shovan Chatterjee',
   description: 'Notes on Programming',
   author: 'Shovan Chatterjee',
-  email: 'hello@shovanch.com',
+  email: 'hi@shovanch.com',
 } as const;
 
 export const defaultMeta: SiteMeta = {

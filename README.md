@@ -352,7 +352,7 @@ This is primarily a personal website, but contributions to improve the codebase 
 
 - **Website**: [shovanch.com](https://shovanch.com)
 - **GitHub**: [@shovanch](https://github.com/shovanch)
-- **Email**: [hello@shovanch.com](mailto:hello@shovanch.com)
+- **Email**: [hi@shovanch.com](mailto:hi@shovanch.com)
 
 ---
 
