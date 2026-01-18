@@ -214,7 +214,27 @@ const canonicalURL = canonical
 <script
   defer
   data-website-id="0c544586-4241-4b4b-a428-c253b02850cf"
+  data-auto-track="false"
   src="/umami/script.js"></script>
+
+<script>
+  // Only track page views when page is actually visible (not prerendered)
+  if (document.prerendering) {
+    document.addEventListener('prerenderingchange', () => {
+      if (window.umami) umami.track();
+    }, { once: true });
+  } else if (document.visibilityState === 'visible') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.umami) umami.track();
+    });
+  } else {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && window.umami) {
+        umami.track();
+      }
+    }, { once: true });
+  }
+</script>
 
 <!-- REF: https://umami.is/docs/track-outbound-links -->
 <script type="text/javascript">
