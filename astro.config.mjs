@@ -1,8 +1,8 @@
 // @ts-check
+import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
 import pagefind from 'astro-pagefind';
@@ -16,7 +16,6 @@ import {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://shovanch.com',
-  trailingSlash: 'always',
   build: {
     format: 'directory',
     // Inline all styles to eliminate render-blocking CSS

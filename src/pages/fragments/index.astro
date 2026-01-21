@@ -7,6 +7,21 @@ import { getFragments } from '~/utils/get-fragments';
 import FragmentCard from '~/components/fragment-card.astro';
 
 const fragments = await getFragments();
+
+// Get all unique fragment types with counts
+const typeCounts = fragments.reduce(
+  (acc, fragment) => {
+    if (fragment.data.fragmentType) {
+      fragment.data.fragmentType.forEach((type) => {
+        acc[type] = (acc[type] || 0) + 1;
+      });
+    }
+    return acc;
+  },
+  {} as Record<string, number>,
+);
+
+const sortedTypes = Object.entries(typeCounts).sort(([, a], [, b]) => b - a);
 ---
 
 <!doctype html>
@@ -27,18 +42,206 @@ const fragments = await getFragments();
         </h1>
       </div>
 
-      <div class="mb-28 flex w-full flex-col md:mt-2">
+      <!-- Mobile Tags Filter - hidden by default, shown via JS when filtering is active -->
+      {sortedTypes.length > 0 && (
+        <section
+          id="mobile-filter-ui"
+          class="-mt-4 mb-2 hidden md:hidden"
+          aria-label="Filter fragments by type"
+        >
+          <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Type filters">
+            <button
+              class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+              data-tag="all"
+            >
+              <span>All</span>
+              <span class="text-theme-text-secondary">({fragments.length})</span>
+            </button>
+            {sortedTypes.map(([type, count]) => (
+              <button
+                class="tag-filter border-theme-border text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center gap-1 rounded-full border px-3 py-1 text-sm outline-none focus:outline-none"
+                data-tag={type}
+              >
+                <span>{type}</span>
+                <span class="text-theme-text-secondary">({count})</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div class="relative">
+        <div class="mb-28 flex w-full flex-col md:mt-2">
         {
           fragments.map((fragment, index) => (
             <>
               <FragmentCard fragment={fragment} />
               {index < fragments.length - 1 && (
-                <hr class="border-theme-text-secondary/30 my-10 border-t" />
+                <hr class="fragment-divider border-theme-text-secondary/30 my-10 border-t" />
               )}
             </>
           ))
         }
+        </div>
+
+        <!-- Desktop Tags Sidebar - hidden by default, shown via JS when filtering is active -->
+        {sortedTypes.length > 0 && (
+          <aside id="desktop-filter-ui" class="absolute top-0 -right-[25%] hidden w-48">
+            <div class="sticky top-8">
+              <div class="flex flex-col text-right text-base">
+                <button
+                  class="tag-filter text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center justify-end gap-1 py-1 outline-none focus:outline-none"
+                  data-tag="all"
+                >
+                  <span>All</span>
+                  <span class="text-theme-text-secondary">{fragments.length}</span>
+                </button>
+                {sortedTypes.map(([type, count]) => (
+                  <button
+                    class="tag-filter text-theme-text-secondary hover:text-theme-text flex cursor-pointer items-center justify-end gap-1 py-1 outline-none focus:outline-none"
+                    data-tag={type}
+                  >
+                    <span>{type}</span>
+                    <span class="text-theme-text-secondary">{count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+        )}
       </div>
     </main>
   </RootLayout>
 </html>
+
+<script is:inline>
+  function initFragmentTagFilter() {
+    const mobileFilterUI = document.getElementById('mobile-filter-ui');
+    const desktopFilterUI = document.getElementById('desktop-filter-ui');
+    const tagFilters = document.querySelectorAll('.tag-filter');
+    const fragmentItems = document.querySelectorAll('.fragment-item');
+    const fragmentDividers = document.querySelectorAll('.fragment-divider');
+
+    function getUrlParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function setUrlParam(param, value) {
+      const url = new URL(window.location.href);
+      if (value === 'all') {
+        url.searchParams.delete(param);
+      } else {
+        url.searchParams.set(param, value);
+      }
+      window.history.pushState({}, '', url.toString());
+    }
+
+    function applyFilter(selectedTag) {
+      // Show/hide filter UIs based on whether filtering is active
+      if (mobileFilterUI) {
+        if (selectedTag) {
+          mobileFilterUI.classList.remove('hidden');
+          mobileFilterUI.classList.add('block');
+        } else {
+          mobileFilterUI.classList.add('hidden');
+          mobileFilterUI.classList.remove('block');
+        }
+      }
+      if (desktopFilterUI) {
+        if (selectedTag) {
+          desktopFilterUI.classList.remove('hidden');
+          desktopFilterUI.classList.add('md:block');
+        } else {
+          desktopFilterUI.classList.add('hidden');
+          desktopFilterUI.classList.remove('md:block');
+        }
+      }
+
+      // Update active state on filter buttons
+      tagFilters.forEach((f) => {
+        const isActive = selectedTag ? f.dataset.tag === selectedTag : f.dataset.tag === 'all';
+        if (f.closest('aside')) {
+          // Desktop sidebar styles
+          if (isActive) {
+            f.classList.remove('text-theme-text-secondary');
+            f.classList.add('text-theme-text', 'font-bold');
+          } else {
+            f.classList.remove('text-theme-text', 'font-bold');
+            f.classList.add('text-theme-text-secondary');
+          }
+        } else {
+          // Mobile styles
+          if (isActive) {
+            f.classList.remove('text-theme-text-secondary', 'border-theme-border');
+            f.classList.add('text-theme-text', 'border-theme-text', 'font-bold');
+          } else {
+            f.classList.remove('text-theme-text', 'border-theme-text', 'font-bold');
+            f.classList.add('text-theme-text-secondary', 'border-theme-border');
+          }
+        }
+      });
+
+      if (!selectedTag) {
+        // No filter - show all
+        fragmentItems.forEach((item) => {
+          item.style.display = 'block';
+        });
+        fragmentDividers.forEach((divider) => {
+          divider.style.display = 'block';
+        });
+        return;
+      }
+
+      // Filter fragments by tag
+      const visibleIndexes = [];
+      fragmentItems.forEach((item, index) => {
+        const fragmentTypes = item.dataset.tags ? item.dataset.tags.split(',') : [];
+        if (!fragmentTypes.includes(selectedTag)) {
+          item.style.display = 'none';
+        } else {
+          item.style.display = 'block';
+          visibleIndexes.push(index);
+        }
+      });
+
+      // Hide dividers appropriately
+      fragmentDividers.forEach((divider, index) => {
+        const prevVisible = visibleIndexes.includes(index);
+        const nextVisible = visibleIndexes.includes(index + 1);
+        divider.style.display = (!prevVisible || !nextVisible) ? 'none' : 'block';
+      });
+    }
+
+    // Initialize filter from URL on page load
+    const initialTag = getUrlParam('tags');
+    applyFilter(initialTag);
+
+    // Add click event listeners
+    tagFilters.forEach((filter) => {
+      filter.addEventListener('click', () => {
+        const selectedTag = filter.dataset.tag;
+        if (selectedTag) {
+          setUrlParam('tags', selectedTag);
+          applyFilter(selectedTag === 'all' ? null : selectedTag);
+        }
+      });
+    });
+
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', () => {
+      const tag = getUrlParam('tags');
+      applyFilter(tag);
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFragmentTagFilter);
+  } else {
+    initFragmentTagFilter();
+  }
+
+  // Also initialize on astro page transitions
+  document.addEventListener('astro:page-load', initFragmentTagFilter);
+</script>

@@ -71,6 +71,10 @@ const fragments = defineCollection({
     publishedAt: dateSchema.optional(),
     updatedAt: dateSchema.optional(),
     isPublished: z.boolean().optional().default(true),
+    fragmentType: z
+      .union([z.array(z.string().trim().min(1)), z.null()])
+      .optional()
+      .transform((val) => val || []),
   }),
 });
 
