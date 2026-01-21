@@ -258,7 +258,7 @@ const canonicalURL = canonical
 
 <!-- REF: https://umami.is/docs/track-outbound-links -->
 <script type="text/javascript">
-  (() => {
+  document.addEventListener('DOMContentLoaded', () => {
     const name = 'outbound-link-click';
     document.querySelectorAll('a').forEach((a) => {
       if (
@@ -269,5 +269,5 @@ const canonicalURL = canonical
         a.setAttribute('data-umami-event-url', a.href);
       }
     });
-  })();
+  });
 </script>
