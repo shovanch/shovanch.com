@@ -204,8 +204,20 @@ const canonicalURL = canonical
   {
     "prerender": [
       {
-        "where": { "href_matches": "/*" },
+        "where": {
+          "href_matches": [
+            "/about/",
+            "/posts/",
+            "/notes/",
+            "/fragments/",
+            "/search/"
+          ]
+        },
         "eagerness": "eager"
+      },
+      {
+        "where": { "href_matches": "/*" },
+        "eagerness": "moderate"
       }
     ]
   }
@@ -214,7 +226,6 @@ const canonicalURL = canonical
 <script
   defer
   data-website-id="0c544586-4241-4b4b-a428-c253b02850cf"
-  data-auto-track="false"
   src="/umami/script.js"></script>
 
 <script>

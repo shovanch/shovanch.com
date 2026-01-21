@@ -14,7 +14,7 @@ const { post } = Astro.props;
     <div class="min-w-0 flex-1">
       <a
         class="max-w-full truncate pl-0! text-lg font-semibold wrap-break-word decoration-1 md:text-xl"
-        href={`/notes/${post.slug}`}
+        href={`/notes/${post.slug}/`}
         aria-label={`Read note: ${post.data.title}`}
         title={post.data.title}
       >

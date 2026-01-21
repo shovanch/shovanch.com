@@ -32,7 +32,7 @@ const posts = filterAndSortContent(allPosts);
           posts.map((post) => (
             <li class="flex items-start justify-between gap-3">
               <a
-                href={`/posts/${post.id}`}
+                href={`/posts/${post.id}/`}
                 class="text-theme-text hover:text-theme-text-secondary font-serif text-lg font-semibold transition-colors duration-200 md:text-xl"
               >
                 {post.data.title}

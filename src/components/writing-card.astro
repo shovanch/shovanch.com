@@ -20,7 +20,7 @@ const isPost = (post: Writing): post is PostWithType => post.type === 'post';
 const renderOnClientRouter = isPost(post)
   ? post.data.renderOnClientRouter
   : true;
-const href = isPost(post) ? `/posts/${post.id}` : `/notes/${post.slug}`;
+const href = isPost(post) ? `/posts/${post.id}/` : `/notes/${post.slug}/`;
 const contentType = isPost(post) ? 'post' : 'note';
 const showExcerpt = isPost(post); // Only show excerpts for posts
 ---

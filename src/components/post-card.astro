@@ -13,7 +13,7 @@ const { post } = Astro.props;
 
 <BaseCard
   title={post.data.title}
-  href={`/posts/${post.id}`}
+  href={`/posts/${post.id}/`}
   publishedAt={post.data.publishedAt}
   body={post.body}
   tags={post.data.tags}
