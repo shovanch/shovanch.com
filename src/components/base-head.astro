@@ -205,7 +205,7 @@ const canonicalURL = canonical
     "prerender": [
       {
         "where": { "href_matches": "/*" },
-        "eagerness": "moderate"
+        "eagerness": "eager"
       }
     ]
   }
@@ -220,19 +220,27 @@ const canonicalURL = canonical
 <script>
   // Only track page views when page is actually visible (not prerendered)
   if (document.prerendering) {
-    document.addEventListener('prerenderingchange', () => {
-      if (window.umami) umami.track();
-    }, { once: true });
+    document.addEventListener(
+      'prerenderingchange',
+      () => {
+        if (window.umami) umami.track();
+      },
+      { once: true },
+    );
   } else if (document.visibilityState === 'visible') {
     document.addEventListener('DOMContentLoaded', () => {
       if (window.umami) umami.track();
     });
   } else {
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && window.umami) {
-        umami.track();
-      }
-    }, { once: true });
+    document.addEventListener(
+      'visibilitychange',
+      () => {
+        if (document.visibilityState === 'visible' && window.umami) {
+          umami.track();
+        }
+      },
+      { once: true },
+    );
   }
 </script>
 

@@ -16,6 +16,7 @@ import {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://shovanch.com',
+  trailingSlash: 'always',
   build: {
     format: 'directory',
     // Inline all styles to eliminate render-blocking CSS

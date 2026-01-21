@@ -12,6 +12,7 @@ import { rehypeExternalLinks } from '../libs/rehype-external-links';
 import { rehypeImageCaptions } from '../libs/rehype-image-captions';
 import { rehypeRawHtmlInCode } from '../libs/rehype-raw-html-in-code';
 import { rehypeToc } from '../libs/rehype-toc';
+import { rehypeTrailingSlash } from '../libs/rehype-trailing-slash';
 import { remarkCallouts } from '../libs/remark-callouts';
 import { remarkSidenotes } from '../libs/remark-sidenotes';
 import { remarkWikilinksSimple } from '../libs/remark-wikilinks-simple.js';
@@ -25,6 +26,7 @@ export const remarkPlugins = [
 ];
 
 export const rehypePlugins: any[] = [
+  rehypeTrailingSlash,
   rehypeToc,
   rehypeHeadingIds,
   [

@@ -50,11 +50,11 @@ export const defaultMeta: SiteMeta = {
 export const navigationConfig = {
   mainMenu: [
     { label: 'home', url: '/' },
-    { label: 'posts', url: '/posts' },
-    { label: 'notes', url: '/notes' },
-    { label: 'fragments', url: '/fragments' },
-    { label: 'about', url: '/about' },
-    { label: 'search', url: '/search' },
+    { label: 'posts', url: '/posts/' },
+    { label: 'notes', url: '/notes/' },
+    { label: 'fragments', url: '/fragments/' },
+    { label: 'about', url: '/about/' },
+    { label: 'search', url: '/search/' },
   ],
   socialLinks: [
     { label: 'email', url: `mailto:${siteConfig.email}` },
@@ -87,19 +87,19 @@ export const exploreLinks: ExploreLink[] = [
   {
     title: 'Posts',
     description: "Essays I've taken time to finish",
-    url: '/posts',
+    url: '/posts/',
   },
   {
     title: 'Notes',
     description: "Stuff I'm learning, mostly for myself",
-    url: '/notes',
+    url: '/notes/',
   },
   {
     title: 'Fragments',
     description: 'Stray thoughts, links, tiny updates',
-    url: '/fragments',
+    url: '/fragments/',
   },
-  { title: 'Search', description: 'Everything I’ve written', url: '/search' },
+  { title: 'Search', description: "Everything I've written", url: '/search/' },
 ];
 
 // Re-export for backward compatibility (from the old data/index.ts)
